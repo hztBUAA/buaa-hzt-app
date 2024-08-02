@@ -32,9 +32,10 @@
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
     </v-app-bar>
-
+    
     <v-main>
-      <HelloWorld />
+      <!-- <HelloWorld /> -->
+      <router-view></router-view>
     </v-main>
   </v-app>
 </template>
