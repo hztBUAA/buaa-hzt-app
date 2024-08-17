@@ -19,7 +19,7 @@ const routes = [
   {
     path: '/p',
     name: 'Post',
-    component: () => import('./components/Post/card4.vue'),
+    component: () => import('./components/Post/index.vue'),
     children: [
       {
         path: '2',
@@ -35,12 +35,23 @@ const routes = [
         path: '3',
         name: 'Post3',
         component: () => import('./components/Post/card3.vue')
+      },
+      {
+        path: '4',
+        name: 'Post4',
+        component: () => import('./components/Post/card4.vue')
       }
-      // {
-      //   path: '4',
-      //   name: 'Post4',
-      //   component: () => import('./components/Post/card4.vue')
-      // }
+    ]
+  },
+  {
+    path: '/snackbar',
+    name: 'Snackbar',
+    children: [
+      {
+        path: '1',
+        name: 'Snackbar1',
+        component: () => import('./components/Snackbar/1.vue')
+      }
     ]
   }
 ];

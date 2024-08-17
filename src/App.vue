@@ -1,40 +1,28 @@
 <template>
   <v-app>
-    <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
+    <v-app-bar
+      color="primary"
+      density
+      image="https://picsum.photos/1920/1080?random"
+    >
+      <template v-slot:image>
         <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40"
-        />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
+          gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"
+        ></v-img>
+      </template>
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+      </template>
+      <v-app-bar-title>Hzt's Site</v-app-bar-title>
+      <v-btn icon>
+        <v-icon>mdi-heart</v-icon>
+      </v-btn>
+      <v-btn icon>
+        <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
-    
+
     <v-main>
-      <!-- <HelloWorld /> -->
       <router-view></router-view>
     </v-main>
   </v-app>
