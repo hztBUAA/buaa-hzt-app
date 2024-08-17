@@ -6,7 +6,6 @@
         <v-img :src="logo" class="my-3" contain height="200" />
       </v-col>
 
-
       <v-col class="mb-4">
         <h1 class="display-2 font-weight-bold mb-3">Welcome to Vuetify</h1>
 
@@ -67,6 +66,12 @@
         </v-row>
       </v-col>
     </v-row>
+    <v-row >
+      <v-col cols="12" justify="center" align="center">
+        <v-btn @click.stop="toOtherUrl">change</v-btn>
+      </v-col>
+    </v-row>
+
     <v-bottom-navigation :elevation="24">
       <v-btn value="recent">
         <v-icon>mdi-history</v-icon>
@@ -146,5 +151,12 @@ export default {
       }
     ]
   })
+  ,methods: {
+    toOtherUrl(){
+      this.$router.push({
+        name:'Post3'
+      })
+    }
+  }
 };
 </script>
