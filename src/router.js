@@ -41,6 +41,12 @@ const routes = [
         name: 'Post4',
         component: () => import('./components/Post/card4.vue')
       }
+      ,
+      {
+        path: '5',
+        name: 'Post5',
+        component: () => import('./components/Post/card5.vue')
+      }
     ]
   },
   {
