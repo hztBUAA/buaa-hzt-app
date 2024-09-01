@@ -14,8 +14,11 @@
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title>Hzt's Site</v-app-bar-title>
-      <v-btn icon>
-        <v-icon>mdi-heart</v-icon>
+      <v-btn @click.stop="go2about" variant="text">
+        关于
+      </v-btn>
+      <v-btn href="http://github.com/hztBUAA">
+        github
       </v-btn>
       <v-btn icon>
         <v-icon>mdi-dots-vertical</v-icon>
@@ -23,26 +26,38 @@
     </v-app-bar>
 
     <v-main>
+      <!-- <v-overlay>
+        <template #activator="{ isActive, props }">
+          <v-btn v-bind="props" block
+            >Overlay is {{ isActive ? 'open' : 'closed' }}</v-btn
+          >
+        </template>
+      </v-overlay> -->
       <router-view></router-view>
     </v-main>
 
     <v-bottom-navigation :elevation="24">
-      <v-btn value="recent" @click="go2Recent">
+      <v-btn value="" @click="go2Recent">
         <v-icon>mdi-history</v-icon>
 
-        <span>Recent</span>
+        <span>探索</span>
       </v-btn>
 
       <v-btn value="favorites" @click.stop="go2Favorites">
         <v-icon>mdi-heart</v-icon>
 
-        <span>Favorites</span>
+        <span>猜你喜欢</span>
+      </v-btn>
+      <v-btn value="jiajiao" @click.stop="go2jiajiao">
+        <v-icon>mdi-school</v-icon>
+
+        <span>家教</span>
       </v-btn>
 
       <v-btn value="me" @click.stop="go2Me">
         <v-icon>mdi-map-marker</v-icon>
 
-        <span>Me</span>
+        <span>我的</span>
       </v-btn>
     </v-bottom-navigation>
   </v-app>
@@ -72,9 +87,19 @@ export default {
         name: 'Favorites'
       });
     },
+    go2jiajiao() {
+      this.$router.push({
+        name: 'jiajiao'
+      });
+    },
     go2Me() {
       this.$router.push({
         name: 'Me'
+      });
+    },
+    go2about() {
+      this.$router.push({
+        name: 'About'
       });
     }
   }
