@@ -1,10 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar
-      color="primary"
-      density
-      image="https://picsum.photos/1920/1080?random"
-    >
+    <v-app-bar color="primary" density image="https://picsum.photos/1920/1080">
       <template v-slot:image>
         <v-img
           gradient="to top right, rgba(19,84,122,.8), rgba(128,208,199,.8)"
@@ -13,11 +9,30 @@
       <template v-slot:prepend>
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
-      <v-app-bar-title>Hzt's Site</v-app-bar-title>
-      <v-btn @click.stop="go2about" variant="text">
+      <v-app-bar-title>HZT小站</v-app-bar-title>
+      <!-- <v-btn @click="toggleTheme">toggle theme</v-btn> -->
+      <v-btn
+        @click.stop="go2Posts"
+        variant="text"
+        prepend-icon="mdi-post-outline"
+      >
+        动态
+      </v-btn>
+      <v-btn
+        @click.stop="go2nearby"
+        variant="text"
+        prepend-icon="mdi-account-multiple"
+      >
+        附近
+      </v-btn>
+      <v-btn
+        @click.stop="go2about"
+        variant="text"
+        prepend-icon="mdi-information"
+      >
         关于
       </v-btn>
-      <v-btn href="http://github.com/hztBUAA">
+      <v-btn href="http://github.com/hztBUAA" prepend-icon="mdi-github">
         github
       </v-btn>
       <v-btn icon>
@@ -65,7 +80,7 @@
 
 <script>
 import HelloWorld from './components/HelloWorld';
-
+import { useTheme } from 'vuetify';
 export default {
   name: 'App',
 
@@ -101,6 +116,19 @@ export default {
       this.$router.push({
         name: 'About'
       });
+    },
+    go2Posts() {
+      this.$router.push({
+        name: 'Post'
+      });
+    },
+    go2nearby() {
+      this.$router.push({
+        name: 'nearby'
+      });
+    },
+    toggleTheme() {
+      this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
     }
   }
 };

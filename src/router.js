@@ -104,6 +104,11 @@ const routes = [
     path: '/about/',
     name: 'About',
     component: () => import('./components/about/index.vue')
+  },
+  {
+    path: '/nearby/',
+    name: 'nearby',
+    component: () => import('./components/nearby/index.vue')
   }
 ];
 // Loop through the notebook names to create route objects
