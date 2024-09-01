@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid>
+  <v-container>
     <v-row dense>
       <v-col v-for="c in cards" :key="c.id" cols="6">
         <v-card :subtitle="c.subtitle" :title="c.title" :text="c.content">
@@ -51,6 +51,7 @@
         </v-card>
       </v-col>
     </v-row>
+    <card7></card7>
     <v-row>
       <router-view></router-view>
     </v-row>
@@ -60,10 +61,14 @@
 
 <script>
 import axios from '@/plugins/axios';
+import card7 from './card7.vue';
 export default {
   data: () => ({
     cards: []
   }),
+  components: {
+    card7
+  },
   mounted() {
     this.cards = this.fetchBlogs();
   },

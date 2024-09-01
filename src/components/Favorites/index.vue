@@ -13,7 +13,7 @@
       :type="type"
       auto-draw
     ></v-sparkline>
-    <v-speed-dial location="right center" transition="fade-transition">
+    <!-- <v-speed-dial location="right center" transition="fade-transition">
       <template v-slot:activator="{ props: activatorProps }">
         <v-fab v-bind="activatorProps" size="large" icon="$vuetify"></v-fab>
       </template>
@@ -22,7 +22,42 @@
       <v-btn key="2" icon="$info"></v-btn>
       <v-btn key="3" icon="$warning"></v-btn>
       <v-btn key="4" icon="$error"></v-btn>
-    </v-speed-dial>
+    </v-speed-dial> -->
+
+    <v-hover v-slot="{ isHovering, props }">
+      <v-card class="mx-auto" max-width="344" v-bind="props">
+        <v-img
+          src="https://cdn.vuetifyjs.com/images/cards/forest-art.jpg"
+        ></v-img>
+
+        <v-card-text>
+          <h2 class="text-h6 text-primary">Magento Forests</h2>
+          Travel to the best outdoor experience on planet Earth. A vacation you
+          will never forget!
+        </v-card-text>
+
+        <v-card-title>
+          <v-rating
+            :model-value="4"
+            background-color="orange"
+            class="me-2"
+            color="orange"
+            dense
+            hover
+          ></v-rating>
+          <span class="text-primary text-subtitle-2">64 Reviews</span>
+        </v-card-title>
+
+        <v-overlay
+          :model-value="!!isHovering"
+          class="align-center justify-center"
+          scrim="#036358"
+          contained
+        >
+          <v-btn variant="flat">See more info</v-btn>
+        </v-overlay>
+      </v-card>
+    </v-hover>
   </v-container>
 </template>
 <script>
