@@ -24,19 +24,22 @@ jobs:
       - name: Build the project
         run: npm run build  # 根据你的项目配置可能是 npm run build
 
+      # Debug output step: Temporarily print host and username
+      - name: Debug output
+        run: |
+          echo "Host (from secrets): ${{ secrets.SERVER_IP }}"
+          echo "Username (from secrets): ${{ secrets.USERNAME }}"
+          # 不要打印 SSH 私钥
+          # echo "SSH Key: ${{ secrets.SSH_PRIVATE_KEY }}"
+
+      # Deploy step: Replace secrets with direct values for testing
       - name: Deploy to server
         uses: appleboy/scp-action@v0.1.0
         with:
-          host: ${{ secrets.SERVER_IP }}  # 服务器 IP 地址
-          username: ${{ secrets.USERNAME }}  # SSH 用户名
-          key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥
-          port: 22  # SSH 端口
-          source: "dist/*"  # 构建后的文件
+          host: "your-server-ip"          # 直接填入你的服务器 IP 地址
+          username: "your-username"        # 直接填入你的用户名
+          key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥仍然使用 secrets
+          port: 22                         # SSH 端口
+          source: "dist/*"                 # 构建后的文件
           target: "/home/ubuntu/projects/mywebsite"  # Nginx 的目标目录
-
-      - name: Debug output
-        run: |
-          echo "Host: ${{ secrets.SERVER_IP }}"
-          echo "Username: ${{ secrets.USERNAME }}"
-          echo "Username: ${{ secrets.SSH_PRIVATE_KEY }}"
-          
+          debug: true                      # 打开调试模式
