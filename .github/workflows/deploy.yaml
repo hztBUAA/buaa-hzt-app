@@ -32,4 +32,11 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}  # SSH 私钥
           port: 22  # SSH 端口
           source: "dist/*"  # 构建后的文件
-          target: "/var/www/html"  # Nginx 的目标目录
+          target: "/home/ubuntu/projects/mywebsite"  # Nginx 的目标目录
+
+      - name: Debug output
+        run: |
+          echo "Host: ${{ secrets.SERVER_IP }}"
+          echo "Username: ${{ secrets.USERNAME }}"
+          echo "Username: ${{ secrets.SSH_PRIVATE_KEY }}"
+          
