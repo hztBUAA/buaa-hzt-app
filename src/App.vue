@@ -30,7 +30,7 @@
         variant="text"
         prepend-icon="mdi-information"
       >
-        关于
+        关于我
       </v-btn>
       <v-btn href="http://github.com/hztBUAA" prepend-icon="mdi-github">
         github
