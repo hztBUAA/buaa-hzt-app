@@ -13,6 +13,11 @@ for (let i = 1; i <= num; i++) {
 // Initialize the routes array with the Home route
 const routes = [
   {
+    path: '/',
+    name: 'Home',
+    component: () => import('./components/Post/index.vue')
+  },
+  {
     path: '/post/',
     name: 'Post',
     component: () => import('./components/Post/index.vue'),

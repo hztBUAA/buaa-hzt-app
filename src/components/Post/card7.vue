@@ -1,5 +1,5 @@
 <template>
-
+  <v-container>
     <v-dialog v-model="dialog" max-width="600" persistent>
       <template v-slot:activator="{ props: activatorProps }">
         <v-btn
@@ -65,13 +65,26 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar v-model="snackbar" :timeout="3000" top>
+      {{ snackbarMessage }}
+    </v-snackbar>
+  </v-container>
     
 
 </template>
 
 <script>
 import axios from '@/plugins/axios';
+// import { Message } from 'element-ui';
+// import 'element-ui/lib/theme-chalk/message.css';
 
+const visibilityMap = {
+  公开: 'public',
+  私密: 'private',
+  // TODO
+  // 部分好友可见: 'friends',
+  // 部分好友不可见: 'exclude'
+};
 export default {
   data: () => ({
     dialog: false,
@@ -80,7 +93,9 @@ export default {
       subtitle: '',
       visibility: '',
       content: ''
-    }
+    },
+    snackbar: false,
+    snackbarMessage: ''
   }),
   methods: {
     getInitialFormState() {
@@ -93,31 +108,40 @@ export default {
         age: ''
       };
     },
+    showSnackbar(message) {
+      this.snackbarMessage = message;
+      this.snackbar = true;
+    },
     async submitForm() {
-      // Form validation logic
-      // if (
-      //   !this.form.firstName ||
-      //   !this.form.lastName ||
-      //   !this.form.email ||
-      //   !this.form.password ||
-      //   !this.form.confirmPassword ||
-      //   !this.form.age
-      // ) {
-      //   alert('Please fill out all required fields.');
-      //   return;
-      // }
-
-      // Submit form data (for example, using an HTTP request)
-      const response = await axios.post('posts/', this.form);
-
-      // console.log('Form submitted with data:', this.form, 'Response:', response);
-
-      // Reset the form fields
-      this.form = this.getInitialFormState();
-
-      // Close dialog after submission
-      this.dialog = false;
-    }
+      try {
+        this.form.visibility = visibilityMap[this.form.visibility];
+        // 提交表单数据（例如，使用 HTTP 请求）
+        const response = await axios.post('posts/', this.form);
+        
+        if (response.status === 200) {
+          // 成功，跳转到主页
+          this.$router.push('/');
+          // 显示成功消息
+          this.showSnackbar('Post created successfully');
+        } else if (response.status === 500) {
+          // 服务器错误，显示错误消息
+          this.showSnackbar('Server error');
+        } else if (response.status === 400 || response.status === 404 || response.status === 401) {
+          // 错误请求，显示错误消息
+          this.showSnackbar('Bad request');
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 403) {
+          // 未授权，跳转到登录页面
+          this.$router.push('/login/1');
+          this.showSnackbar('请先登录');
+        } else {
+          // 处理其他错误
+          this.showSnackbar('An error occurred');
+        }
+      }
+    },
+    
   }
 };
 </script>
