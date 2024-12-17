@@ -51,6 +51,14 @@
         </v-card>
       </v-col>
     </v-row>
+    <!-- 进入about的优美link -->
+    <v-btn
+      color="primary"
+      class="mt-5"
+      @click="$router.push({ name: 'About' })"
+      append-icon="mdi-arrow-right"
+      text="看看hzt"
+    />
     <card7></card7>
     <v-row>
       <router-view></router-view>
