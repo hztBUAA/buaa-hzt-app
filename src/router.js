@@ -1,6 +1,6 @@
 // src/router.js
 import { comma } from 'postcss/lib/list';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 // import HomePage from './components/HelloWorld.vue';
 // const notebookNames = ['n1', 'n2', 'n3']; // Add more notebook names as needed
 const num = 10;
@@ -147,8 +147,8 @@ for (let i = 1; i <= 10; i++) {
 //-------------------------------------------------------------------------------------------------------
 
 const router = createRouter({
-  // history: createWebHistory(),
-  routes,
+  history: createWebHashHistory(),
+  routes
 });
 
 export default router;
