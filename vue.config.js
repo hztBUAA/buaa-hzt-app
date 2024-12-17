@@ -3,7 +3,7 @@ const { VuetifyPlugin } = require('webpack-plugin-vuetify');
 const path = require('path'); // Add this line
 
 module.exports = defineConfig({
-  publicPath: '/',
+  publicPath: '.',
   transpileDependencies: ['vuetify'],
   configureWebpack: {
     plugins: [
@@ -18,6 +18,6 @@ module.exports = defineConfig({
     }
   },
   devServer: {
-    historyApiFallback: true,  // This tells the server to serve index.html for all 404 routes
+    historyApiFallback: true // This tells the server to serve index.html for all 404 routes
   }
 });
