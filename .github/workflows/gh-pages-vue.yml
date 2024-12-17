@@ -1,0 +1,49 @@
+# Sample workflow for building and deploying a Jekyll site to GitHub Pages
+name: Deploy Vue.js to GitHub Pages
+on:
+  push:
+    branches:
+      - main  # 监听 main 分支的 push 事件
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. 检出代码
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    # 2. 安装 Node.js
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '16'  # 选择 Node.js 版本
+
+    # 3. 安装依赖
+    - name: Install Dependencies
+      run: npm install
+
+    # 4. 构建 Vue 项目
+    - name: Build Vue.js Project
+      run: npm run build  # Vue 默认的构建命令
+
+    # 5. 部署到 GitHub Pages
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}  # 使用 GitHub 提供的权限令牌
+        publish_dir: ./dist  # Vue 构建后的目录
+
