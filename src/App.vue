@@ -10,6 +10,18 @@
         <v-app-bar-nav-icon></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title>HZT小站</v-app-bar-title>
+      <!-- 返回按钮 -->
+      <v-btn
+        variant="text"
+        @click.stop="goBack"
+        prepend-icon="mdi-arrow-left"
+        text="返回"
+      />
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
+      <v-spacer></v-spacer>
       <!-- <v-btn @click="toggleTheme">toggle theme</v-btn> -->
       <v-btn
         @click.stop="go2Posts"
@@ -92,6 +104,9 @@ export default {
     //
   }),
   methods: {
+    goBack() {
+      this.$router.go(-1);
+    },
     go2Recent() {
       this.$router.push({
         name: 'Post'
