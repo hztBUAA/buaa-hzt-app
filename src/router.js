@@ -147,8 +147,8 @@ for (let i = 1; i <= 10; i++) {
 //-------------------------------------------------------------------------------------------------------
 
 const router = createRouter({
-  history: createWebHistory(),
-  routes
+  // history: createWebHistory(),
+  routes,
 });
 
 export default router;
