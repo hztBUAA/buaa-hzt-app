@@ -1,6 +1,10 @@
 // src/router.js
 import { comma } from 'postcss/lib/list';
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import {
+  createRouter,
+  createWebHashHistory,
+  createWebHistory
+} from 'vue-router';
 // import HomePage from './components/HelloWorld.vue';
 // const notebookNames = ['n1', 'n2', 'n3']; // Add more notebook names as needed
 const num = 10;
@@ -15,7 +19,14 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('./components/Post/index.vue')
+    component: () => import('./components/Post/index.vue'),
+    children: [
+      {
+        path: 'about/',
+        name: 'About',
+        component: () => import('./components/about/index.vue')
+      }
+    ]
   },
   {
     path: '/post/',
