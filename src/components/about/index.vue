@@ -60,8 +60,8 @@
             <v-img
               v-if="item.type === 'image'"
               :src="item.src"
-              :alt="`轮播图 ${i+1}`"
-              height="400"
+              :alt="`轮播图`"
+              height="100%"
               class="d-flex align-center justify-center"
               contain
             >
@@ -72,8 +72,8 @@
             <v-img
               v-else-if="item.type === 'gif'"
               :src="item.src"
-              :alt="`动态图 ${i+1}`"
-              height="400"
+              :alt="`动态图`"
+              height="100%"
               class="d-flex align-center justify-center"
               contain
             >
@@ -84,7 +84,7 @@
             <div class="video-wrapper" v-else-if="item.type === 'video'">
               <video
                 :src="item.src"
-                height="400"
+                height="100%"
                 class="d-flex align-center justify-center video-container"
                 controls
                 muted
@@ -1532,7 +1532,7 @@ export default {
 .video-wrapper {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
