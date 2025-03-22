@@ -88,24 +88,58 @@
           </v-card>
         </v-col>
 
-        <!-- 技能展示卡片 -->
+        <!-- 技能和兴趣爱好区域 -->
         <v-col cols="12" md="8">
-          <v-card>
+          <!-- 技能展示卡片 -->
+          <v-card class="mb-4">
             <v-card-title class="d-flex align-center">
               <v-icon start icon="mdi-lightbulb" class="mr-2"></v-icon>
               技能专长
             </v-card-title>
             <v-card-text>
-              <v-chip-group>
+              <div class="skills-container">
                 <v-chip
                   v-for="skill in skills"
                   :key="skill.name"
                   :color="skill.color"
                   variant="elevated"
+                  class="ma-1"
                 >
                   {{ skill.name }}
                 </v-chip>
-              </v-chip-group>
+              </div>
+            </v-card-text>
+          </v-card>
+
+          <!-- 兴趣爱好卡片 -->
+          <v-card>
+            <v-card-title class="d-flex align-center">
+              <v-icon start icon="mdi-heart" class="mr-2"></v-icon>
+              生活 & 兴趣
+            </v-card-title>
+            <v-card-text>
+              <v-row>
+                <v-col 
+                  v-for="(hobby, index) in hobbies" 
+                  :key="index"
+                  cols="12" 
+                  sm="6"
+                >
+                  <v-card variant="outlined" class="hobby-card">
+                    <v-card-item>
+                      <template v-slot:prepend>
+                        <v-icon
+                          :icon="hobby.icon"
+                          :color="hobby.color"
+                          size="large"
+                        ></v-icon>
+                      </template>
+                      <v-card-title>{{ hobby.name }}</v-card-title>
+                      <v-card-subtitle>{{ hobby.description }}</v-card-subtitle>
+                    </v-card-item>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-card-text>
           </v-card>
         </v-col>
@@ -148,29 +182,89 @@ export default {
           bio: userData.bio || userProfile.value.bio
         }
 
-        // 更新统计数据
+        // 更新基础统计数据
         statistics.value = {
           projects: { value: userData.public_repos, label: '仓库数' },
           followers: { value: userData.followers, label: '关注者' },
           following: { value: userData.following, label: '关注中' },
-          stars: { value: 0, label: '获得星标' }, // 将在下面更新
-          contributions: { value: 0, label: '贡献数' } // 将在下面更新
+          stars: { value: 0, label: '获得星标' },
+          contributions: { value: 0, label: '贡献数' }
         }
 
-        // 获取用户的所有仓库来计算获得的星标数
-        const reposResponse = await fetch(userData.repos_url)
-        const reposData = await reposResponse.json()
-        const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0)
-        statistics.value.stars.value = totalStars
-
-        // 获取贡献数据
-        // 注意: GitHub的贡献数据需要通过GraphQL API获取
-        // 这里我们可以使用其他端点或保留现有数值
+        // 获取完整的star数据
+        await fetchAllStars()
         
+        // 获取贡献数据
+        await fetchContributions()
+
       } catch (error) {
         console.error('获取GitHub数据失败:', error)
       }
     }
+
+    const fetchContributions = async () => {
+      const query = `
+        query {
+          user(login: "hztBUAA") {
+            contributionsCollection {
+              totalCommitContributions
+              totalIssueContributions
+              totalPullRequestContributions
+              totalPullRequestReviewContributions
+              contributionCalendar {
+                totalContributions
+                weeks {
+                  contributionDays {
+                    contributionCount
+                    date
+                  }
+                }
+              }
+            }
+          }
+        }
+      `
+
+      try {
+        const response = await fetch('https://api.github.com/graphql', {
+          method: 'POST',
+          headers: {
+            'Authorization': `bearer ${process.env.VUE_APP_GITHUB_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ query })
+        })
+
+        const data = await response.json()
+        console.log('data', data)
+        const contributions = data.data.user.contributionsCollection
+        
+        // 更新统计数据
+        statistics.value.contributions.value = 
+          contributions.contributionCalendar.totalContributions
+      } catch (error) {
+        console.error('获取贡献数据失败:', error)
+      }
+    }
+
+    const fetchAllStars = async () => {
+      try {
+        // 1. 获取用户自己的仓库的star
+        const ownReposResponse = await fetch('https://api.github.com/users/hztBUAA/repos');
+        const ownRepos = await ownReposResponse.json();
+        const ownStars = ownRepos.reduce((sum, repo) => sum + repo.stargazers_count, 0);
+
+        // 2. 获取你作为贡献者的项目的star
+        const contributedRepoResponse = await fetch('https://api.github.com/repos/DocAILab/XRAG');
+        const contributedRepo = await contributedRepoResponse.json();
+        const contributedStars = contributedRepo.stargazers_count;
+
+        // 更新总star数
+        statistics.value.stars.value = ownStars + contributedStars;
+      } catch (error) {
+        console.error('获取star数据失败:', error);
+      }
+    };
 
     // 组件挂载时获取数据
     onMounted(() => {
@@ -197,21 +291,41 @@ export default {
     ])
 
     const skills = ref([
-      { name: 'Vue.js', color: 'success' },
-      { name: 'JavaScript', color: 'warning' },
-      { name: 'Node.js', color: 'green' },
+
       { name: 'Python', color: 'blue' },
-      { name: '后端开发', color: 'indigo' },
-      { name: '前端开发', color: 'deep-purple' },
-      { name: '数据库', color: 'orange' },
-      { name: 'DevOps', color: 'red' }
+      { name: 'JavaScript', color: 'indigo' },
+      { name: 'Go', color: 'green' },
+      { name: 'Pytorch', color: 'red' },
+      { name: 'Linux', color: 'purple' },
+      { name: 'Docker', color: 'orange' },
+      // { name: '后端开发', color: 'indigo' },
+      // { name: '前端开发', color: 'deep-purple' },
+      // { name: '数据库', color: 'orange' },
+      // { name: 'DevOps', color: 'red' }
+    ])
+
+    // 兴趣爱好数据
+    const hobbies = ref([
+      {
+        name: '编程',
+        description: '探索新技术，创造有趣的项目',
+        icon: 'mdi-laptop',
+        color: 'primary'
+      },
+      {
+        name: '运动',
+        description: '篮球和健身',
+        icon: 'mdi-basketball',
+        color: 'warning'
+      }
     ])
 
     return {
       userProfile,
       socialLinks,
       statistics,
-      skills
+      skills,
+      hobbies
     }
   }
 }
@@ -254,5 +368,35 @@ export default {
   .profile-details {
     text-align: center;
   }
+}
+
+.hobby-card {
+  transition: transform 0.2s;
+}
+
+.hobby-card:hover {
+  transform: translateY(-4px);
+}
+
+/* 确保卡片高度一致 */
+.v-card-item {
+  min-height: 100px;
+}
+
+/* 添加一些间距 */
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 确保卡片内容区域有合适的内边距 */
+.v-card-text {
+  padding: 16px;
 }
 </style>
