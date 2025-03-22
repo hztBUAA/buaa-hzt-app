@@ -1,6 +1,5 @@
 // src/router.js
-import { comma } from 'postcss/lib/list';
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 // import HomePage from './components/HelloWorld.vue';
 // const notebookNames = ['n1', 'n2', 'n3']; // Add more notebook names as needed
 const num = 10;
@@ -20,54 +19,7 @@ const routes = [
   {
     path: '/post/',
     name: 'Post',
-    component: () => import('./components/Post/index.vue'),
-    children: [
-      {
-        path: '2/',
-        name: 'Post2',
-        component: () => import('./components/Post/card2.vue')
-      },
-      {
-        path: '1/',
-        name: 'Post1',
-        component: () => import('./components/Post/card1.vue')
-      },
-      {
-        path: '3/',
-        name: 'Post3',
-        component: () => import('./components/Post/card3.vue')
-      },
-      {
-        path: '4/',
-        name: 'Post4',
-        component: () => import('./components/Post/card4.vue')
-      },
-      {
-        path: '5/',
-        name: 'Post5',
-        component: () => import('./components/Post/card5.vue')
-      },
-      {
-        path: '6/',
-        name: 'Post6',
-        component: () => import('./components/Post/card6.vue')
-      },
-      {
-        path: '7/',
-        name: 'Post7',
-        component: () => import('./components/Post/card7.vue')
-      },
-      {
-        path: '8/',
-        name: 'Post8',
-        component: () => import('./components/Post/card8.vue')
-      }
-    ]
-  },
-  {
-    path: '/p9/',
-    name: 'Post9',
-    component: () => import('./components/Post/card9.vue')
+    component: () => import('./components/Post/index.vue')
   },
   {
     path: '/snackbar/',
@@ -91,16 +43,6 @@ const routes = [
     component: () => import('./components/jiajiao/index.vue')
   },
   {
-    path: '/knowledge/',
-    name: 'knowledge',
-    component: () => import('./components/jiajiao/knowledge/index.vue')
-  },
-  {
-    path: '/profile/',
-    name: 'profile',
-    component: () => import('./components/jiajiao/Profile.vue')
-  },
-  {
     path: '/me/',
     name: 'Me',
     component: () => import('./components/Me/index.vue')
@@ -116,6 +58,7 @@ const routes = [
     component: () => import('./components/nearby/index.vue')
   }
 ];
+
 // Loop through the notebook names to create route objects
 notebookNames.forEach((name) => {
   routes.push({
