@@ -158,7 +158,7 @@ export default {
       title: '全栈开发工程师',
       bio: '热爱编程，专注于Web开发和人工智能领域',
       avatar: '',
-      coverImage: 'https://cdn.vuetifyjs.com/images/cards/dark-beach.jpg'
+      coverImage: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg'
     })
 
     const statistics = ref({
