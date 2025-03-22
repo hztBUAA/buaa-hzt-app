@@ -19,14 +19,13 @@
           </v-card-title>
           <v-card-text>
             <v-select
-              v-model="selectedTimeline"
+              v-model="currentTimeline"
               :items="availableTimelines"
               item-title="name"
               item-value="id"
               label="选择时间线"
               variant="outlined"
               density="comfortable"
-              return-object
             ></v-select>
             
             <v-divider class="my-4"></v-divider>
@@ -40,6 +39,17 @@
               @click="showImportDialog = true"
             >
               导入时间线数据
+            </v-btn>
+            
+            <v-btn 
+              color="secondary" 
+              prepend-icon="mdi-download" 
+              variant="tonal"
+              block
+              class="mb-2"
+              @click="exportCurrentTimeline"
+            >
+              导出当前时间线
             </v-btn>
             
             <v-btn 
@@ -72,6 +82,35 @@
         </v-btn-toggle>
       </v-card-title>
       <v-card-subtitle>{{ selectedTimeline.description }}</v-card-subtitle>
+      
+      <v-card-text>
+        <v-row>
+          <v-col cols="12" sm="6">
+            <v-btn 
+              color="primary" 
+              prepend-icon="mdi-upload" 
+              variant="tonal"
+              block
+              class="mb-2"
+              @click="showImportDialog = true"
+            >
+              导入时间线数据
+            </v-btn>
+          </v-col>
+          <v-col cols="12" sm="6">
+            <v-btn 
+              color="primary" 
+              prepend-icon="mdi-notebook-plus" 
+              variant="tonal"
+              block
+              class="mb-2"
+              @click="openDiaryImportDialog"
+            >
+              导入日记数据
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
     
     <!-- 垂直时间线视图 -->
@@ -322,160 +361,291 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
+    <!-- 导入日记数据对话框 -->
+    <v-dialog v-model="showDiaryImportDialog" max-width="600">
+      <v-card>
+        <v-card-title class="text-h5">导入日记数据</v-card-title>
+        <v-card-text>
+          <v-alert
+            v-if="diaryImportError"
+            type="error"
+            variant="tonal"
+            density="comfortable"
+            class="mb-3"
+          >
+            {{ diaryImportError }}
+          </v-alert>
+          
+          <v-alert
+            v-if="diaryImportSuccess"
+            type="success"
+            variant="tonal"
+            density="comfortable"
+            class="mb-3"
+          >
+            {{ diaryImportSuccess }}
+          </v-alert>
+          
+          <v-form @submit.prevent="importDiaryToTimeline">
+            <v-file-input
+              v-model="diaryImportFile"
+              accept=".json"
+              label="选择日记数据文件"
+              prepend-icon="mdi-file-document"
+              variant="outlined"
+              class="mb-4"
+              hint="请选择由日记解析脚本生成的JSON文件"
+              persistent-hint
+              @change="handleDiaryFileSelect"
+            ></v-file-input>
+            
+            <v-row>
+              <v-col cols="8">
+                <v-text-field
+                  v-model="diaryTimelineName"
+                  label="时间线名称"
+                  variant="outlined"
+                  hint="为导入的日记时间线取个名字"
+                  persistent-hint
+                ></v-text-field>
+              </v-col>
+              
+              <v-col cols="4">
+                <v-select
+                  v-model="diaryTimelineIcon"
+                  :items="availableIcons"
+                  label="选择图标"
+                  variant="outlined"
+                >
+                  <template v-slot:item="{ item, props }">
+                    <v-list-item v-bind="props">
+                      <template v-slot:prepend>
+                        <v-icon :icon="item.raw"></v-icon>
+                      </template>
+                      <v-list-item-title>{{ item.raw }}</v-list-item-title>
+                    </v-list-item>
+                  </template>
+                  <template v-slot:selection="{ item }">
+                    <v-icon :icon="item.value" class="mr-2"></v-icon>
+                  </template>
+                </v-select>
+              </v-col>
+            </v-row>
+            
+            <div class="text-right mt-2">
+              <v-btn
+                variant="text"
+                color="secondary"
+                prepend-icon="mdi-download"
+                @click="downloadSampleDiaryData"
+              >
+                下载示例数据
+              </v-btn>
+            </div>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            @click="importDiaryToTimeline"
+            :disabled="!diaryImportResult"
+            :loading="diaryImportLoading"
+          >
+            导入到时间线
+          </v-btn>
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="showDiaryImportDialog = false"
+          >
+            取消
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script>
 export default {
-  data: () => ({
-    years: [
-      {
-        color: 'cyan',
-        year: '2021.9',
-        title: '进入北航',
-        content: '在信息大类开始卷啦~'
+  name: "About",
+  data() {
+    return {
+      years: [
+        {
+          color: 'cyan',
+          year: '2021.9',
+          title: '进入北航',
+          content: '在信息大类开始卷啦~'
+        },
+        {
+          color: 'green',
+          year: '2022.6',
+          title: '卷进计算机学院',
+          content:
+            '继续卷，平庸过了一年，发现保研无望，体会到各科分数无法拿到顶尖的无力感~'
+        },
+        {
+          color: 'pink',
+          year: '2023.6',
+          title: '接触了web相关的技术',
+          content:
+            '数据库课设做了一些东西，ruby程序设计也是体会到敏捷开发的成绩感，开始不断学习相关的技术，但总是学不精，也开始逐渐了解前端的概念，尽管现在都还是不太懂css的细节'
+        },
+        {
+          color: 'amber',
+          year: '2024.6',
+          title: '参加实习',
+          content:
+            '远程实习：为此担心过，也中途害怕过；最后也坚持下来，总结了一些生存之道。'
+        },
+        {
+          color: 'orange',
+          year: '2024.8',
+          title: '心血来潮',
+          content:
+            '想用django加上vuetify加快自己开发web app的节奏，想把自己的想法和平时生活中思考的一些好点子和信息紫苑进行分享————大学这几年，深刻体会到信息差的重要性，也希望自己能够分享一些有用的信息~'
+        }
+      ],
+      images: [],
+      // 时间线相关数据
+      timelineView: 'vertical', // 默认垂直视图
+      selectedEvent: null, // 当前选中的事件（用于横向视图）
+      currentTimeline: 'personal', // 当前选中的时间线ID
+      availableTimelines: [
+        { 
+          id: 'personal', 
+          name: '个人历程', 
+          description: '我的个人成长轨迹',
+          icon: 'mdi-account-school', 
+          data: [] // 会在created中填充
+        },
+        { 
+          id: 'tech', 
+          name: '技术成长', 
+          description: '我的技术学习历程',
+          icon: 'mdi-code-tags', 
+          data: [
+            {
+              title: '开始学习HTML和CSS',
+              date: '2022.3',
+              content: '接触前端开发的起点，开始了解网页结构和样式',
+              color: 'blue',
+              tags: ['HTML', 'CSS', '前端']
+            },
+            {
+              title: '学习JavaScript',
+              date: '2022.5',
+              content: '开始学习JavaScript，为动态网页开发打下基础',
+              color: 'yellow-darken-2',
+              tags: ['JavaScript', '前端']
+            },
+            {
+              title: '接触Vue框架',
+              date: '2023.2',
+              content: '开始学习Vue.js框架，感受到现代前端框架的魅力',
+              color: 'green',
+              tags: ['Vue', '前端框架']
+            },
+            {
+              title: '使用Vuetify',
+              date: '2023.8',
+              content: '开始使用Vuetify组件库，加速UI开发效率',
+              color: 'indigo',
+              tags: ['Vuetify', 'UI']
+            }
+          ]
+        },
+        {
+          id: 'diary',
+          name: '我的日记',
+          description: '从日记中提取的记录',
+          icon: 'mdi-notebook-outline',
+          data: []
+        }
+      ],
+      // 导入相关
+      showImportDialog: false,
+      importTab: 'file',
+      importFile: null,
+      importText: '',
+      newTimelineName: '',
+      newTimelineIcon: 'mdi-timeline-clock',
+      // 添加事件相关
+      showAddEntryDialog: false,
+      newEvent: {
+        title: '',
+        date: '',
+        content: '',
+        color: 'primary',
+        tags: []
       },
-      {
-        color: 'green',
-        year: '2022.6',
-        title: '卷进计算机学院',
-        content:
-          '继续卷，平庸过了一年，发现保研无望，体会到各科分数无法拿到顶尖的无力感~'
-      },
-      {
-        color: 'pink',
-        year: '2023.6',
-        title: '接触了web相关的技术',
-        content:
-          '数据库课设做了一些东西，ruby程序设计也是体会到敏捷开发的成绩感，开始不断学习相关的技术，但总是学不精，也开始逐渐了解前端的概念，尽管现在都还是不太懂css的细节'
-      },
-      {
-        color: 'amber',
-        year: '2024.6',
-        title: '参加实习',
-        content:
-          '远程实习：为此担心过，也中途害怕过；最后也坚持下来，总结了一些生存之道。'
-      },
-      {
-        color: 'orange',
-        year: '2024.8',
-        title: '心血来潮',
-        content:
-          '想用django加上vuetify加快自己开发web app的节奏，想把自己的想法和平时生活中思考的一些好点子和信息紫苑进行分享————大学这几年，深刻体会到信息差的重要性，也希望自己能够分享一些有用的信息~'
-      }
-    ],
-    images: [],
-    // 时间线相关数据
-    timelineView: 'vertical', // 默认垂直视图
-    selectedEvent: null, // 当前选中的事件（用于横向视图）
-    selectedTimeline: null, // 当前选中的时间线
-    availableTimelines: [
-      { 
-        id: 'personal', 
-        name: '个人历程', 
-        description: '我的个人成长轨迹',
-        icon: 'mdi-account-school', 
-        data: [] // 会在created中填充
-      },
-      { 
-        id: 'tech', 
-        name: '技术成长', 
-        description: '我的技术学习历程',
-        icon: 'mdi-code-tags', 
-        data: [
-          {
-            title: '开始学习HTML和CSS',
-            date: '2022.3',
-            content: '接触前端开发的起点，开始了解网页结构和样式',
-            color: 'blue',
-            tags: ['HTML', 'CSS', '前端']
-          },
-          {
-            title: '学习JavaScript',
-            date: '2022.5',
-            content: '开始学习JavaScript，为动态网页开发打下基础',
-            color: 'yellow-darken-2',
-            tags: ['JavaScript', '前端']
-          },
-          {
-            title: '接触Vue框架',
-            date: '2023.2',
-            content: '开始学习Vue.js框架，感受到现代前端框架的魅力',
-            color: 'green',
-            tags: ['Vue', '前端框架']
-          },
-          {
-            title: '使用Vuetify',
-            date: '2023.8',
-            content: '开始使用Vuetify组件库，加速UI开发效率',
-            color: 'indigo',
-            tags: ['Vuetify', 'UI']
-          }
-        ]
-      },
-    ],
-    // 导入相关
-    showImportDialog: false,
-    importTab: 'file',
-    importFile: null,
-    importText: '',
-    newTimelineName: '',
-    newTimelineIcon: 'mdi-timeline-clock',
-    // 添加事件相关
-    showAddEntryDialog: false,
-    newEvent: {
-      title: '',
-      date: '',
-      content: '',
-      color: 'primary',
-      tags: []
-    },
-    // 颜色和图标选项
-    availableColors: [
-      { title: '主色调', value: 'primary' },
-      { title: '蓝色', value: 'blue' },
-      { title: '绿色', value: 'green' },
-      { title: '红色', value: 'red' },
-      { title: '橙色', value: 'orange' },
-      { title: '紫色', value: 'purple' },
-      { title: '青色', value: 'cyan' },
-      { title: '粉色', value: 'pink' },
-      { title: '琥珀色', value: 'amber' },
-      { title: '茶色', value: 'brown' }
-    ],
-    availableIcons: [
-      'mdi-timeline-clock',
-      'mdi-timeline-text',
-      'mdi-timeline-outline',
-      'mdi-account-school',
-      'mdi-code-tags',
-      'mdi-heart',
-      'mdi-star',
-      'mdi-book-open',
-      'mdi-rocket-launch',
-      'mdi-map-marker',
-      'mdi-briefcase',
-      'mdi-lightbulb'
-    ]
-  }),
+      // 颜色和图标选项
+      availableColors: [
+        { title: '主色调', value: 'primary' },
+        { title: '蓝色', value: 'blue' },
+        { title: '绿色', value: 'green' },
+        { title: '红色', value: 'red' },
+        { title: '橙色', value: 'orange' },
+        { title: '紫色', value: 'purple' },
+        { title: '青色', value: 'cyan' },
+        { title: '粉色', value: 'pink' },
+        { title: '琥珀色', value: 'amber' },
+        { title: '茶色', value: 'brown' }
+      ],
+      availableIcons: [
+        'mdi-timeline-clock',
+        'mdi-timeline-text',
+        'mdi-timeline-outline',
+        'mdi-account-school',
+        'mdi-code-tags',
+        'mdi-heart',
+        'mdi-star',
+        'mdi-book-open',
+        'mdi-rocket-launch',
+        'mdi-map-marker',
+        'mdi-briefcase',
+        'mdi-lightbulb'
+      ],
+      // 日记解析相关
+      showDiaryImportDialog: false,
+      diaryImportFile: null,
+      diaryImportResult: null,
+      diaryTimelineName: '我的日记',
+      diaryTimelineIcon: 'mdi-notebook-outline',
+      diaryImportLoading: false,
+      diaryImportError: '',
+      diaryImportSuccess: '',
+    };
+  },
   computed: {
     // 当前时间线的数据
     currentTimelineData() {
-      if (!this.selectedTimeline) return [];
-      return this.selectedTimeline.data;
+      if (!this.currentTimeline) return [];
+      return this.availableTimelines.find(t => t.id === this.currentTimeline).data;
     },
     // 判断是否可以导入
     canImport() {
       if (this.importTab === 'file' && !this.importFile) return false;
       if (this.importTab === 'text' && !this.importText.trim()) return false;
       return !!this.newTimelineName.trim();
+    },
+    // 选择当前时间线
+    selectedTimeline() {
+      // 从availableTimelines中查找时间线
+      const timeline = this.availableTimelines.find(t => t.id === this.currentTimeline);
+      return timeline || this.availableTimelines[0];
     }
   },
   created() {
     this.loadImages();
     // 初始化个人历程数据
     this.availableTimelines[0].data = this.years;
-    this.selectedTimeline = this.availableTimelines[0];
+    // 设置当前选中的时间线
+    this.currentTimeline = 'personal';
   },
   methods: {
     loadImages() {
@@ -604,7 +774,7 @@ export default {
         this.availableTimelines.push(newTimeline);
         
         // 切换到新导入的时间线
-        this.selectedTimeline = newTimeline;
+        this.currentTimeline = newTimeline.id;
         
         // 关闭对话框并重置表单
         this.showImportDialog = false;
@@ -630,10 +800,11 @@ export default {
       const eventToAdd = { ...this.newEvent };
       
       // 添加到当前时间线
-      this.selectedTimeline.data.push(eventToAdd);
+      const timeline = this.availableTimelines.find(t => t.id === this.currentTimeline);
+      timeline.data.push(eventToAdd);
       
       // 按日期排序
-      this.selectedTimeline.data.sort((a, b) => {
+      timeline.data.sort((a, b) => {
         const dateA = a.date || a.year || '';
         const dateB = b.date || b.year || '';
         return dateA.localeCompare(dateB);
@@ -648,7 +819,148 @@ export default {
         color: 'primary',
         tags: []
       };
-    }
+    },
+    // 添加导出当前时间线方法
+    exportCurrentTimeline() {
+      if (!this.selectedTimeline || !this.currentTimelineData.length) {
+        alert('当前时间线没有数据可供导出');
+        return;
+      }
+      
+      // 创建导出数据
+      const exportData = [...this.currentTimelineData];
+      
+      // 转换为JSON字符串
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      // 设置文件名
+      const exportFileDefaultName = `${this.selectedTimeline.name}_时间线数据.json`;
+      
+      // 创建下载链接并触发下载
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+    },
+    // 导入日记数据
+    openDiaryImportDialog() {
+      this.showDiaryImportDialog = true;
+      this.diaryImportFile = null;
+      this.diaryImportResult = null;
+      this.diaryImportError = '';
+      this.diaryImportSuccess = '';
+      this.diaryTimelineName = '我的日记';
+      this.diaryTimelineIcon = 'mdi-notebook-outline';
+    },
+    
+    handleDiaryFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      if (file.name.endsWith('.json')) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const jsonData = JSON.parse(event.target.result);
+            if (Array.isArray(jsonData)) {
+              this.diaryImportResult = jsonData;
+              this.diaryImportError = '';
+              this.diaryImportSuccess = `成功解析 ${jsonData.length} 条日记记录，可以导入到时间线`;
+            } else {
+              this.diaryImportError = '日记数据格式错误，应为事件数组';
+              this.diaryImportSuccess = '';
+            }
+          } catch (error) {
+            this.diaryImportError = '解析日记数据失败: ' + error.message;
+            this.diaryImportSuccess = '';
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        this.diaryImportError = '仅支持JSON格式的日记数据文件';
+        this.diaryImportSuccess = '';
+      }
+    },
+    
+    importDiaryToTimeline() {
+      if (!this.diaryImportResult || !Array.isArray(this.diaryImportResult)) {
+        this.diaryImportError = '没有有效的日记数据可导入';
+        return;
+      }
+      
+      // 查找或创建日记时间线
+      let diaryTimeline = this.availableTimelines.find(t => t.id === 'diary');
+      
+      if (!diaryTimeline) {
+        diaryTimeline = {
+          id: 'diary',
+          name: this.diaryTimelineName,
+          description: '从日记中提取的记录',
+          icon: this.diaryTimelineIcon,
+          data: []
+        };
+        this.availableTimelines.push(diaryTimeline);
+      } else {
+        // 更新现有时间线
+        diaryTimeline.name = this.diaryTimelineName;
+        diaryTimeline.icon = this.diaryTimelineIcon;
+      }
+      
+      // 转换日记数据为时间线事件
+      const timelineEvents = this.diaryImportResult.map(entry => {
+        // 处理日期格式 (YYYY.MM.DD -> YYYY.MM.DD)
+        const date = entry.date || '未知';
+        
+        return {
+          date: date,
+          title: entry.title || `日记: ${date}`,
+          content: entry.content || '',
+          color: entry.color || 'blue',
+          tags: entry.tags || []
+        };
+      });
+      
+      // 更新时间线事件
+      diaryTimeline.data = timelineEvents;
+      
+      // 选择日记时间线
+      this.currentTimeline = diaryTimeline.id;
+      
+      // 关闭对话框
+      this.diaryImportSuccess = `成功导入 ${timelineEvents.length} 个日记事件到时间线`;
+      setTimeout(() => {
+        this.showDiaryImportDialog = false;
+      }, 1500);
+    },
+    
+    // 下载示例日记数据
+    downloadSampleDiaryData() {
+      const sampleData = [
+        {
+          "date": "2023.10.15",
+          "title": "日记: 2023.10.15",
+          "content": "完成了Python项目重构。阅读了《原子习惯》，思考了如何通过微习惯堆叠来实现大目标。发现自己经常陷入\"忙碌但不高效\"的状态，决定尝试番茄工作法。",
+          "color": "blue",
+          "tags": ["编程", "阅读", "时间管理"]
+        },
+        {
+          "date": "2023.10.16",
+          "title": "日记: 2023.10.16",
+          "content": "尝试了番茄工作法，效果不错。完成了新功能开发，解决了几个棘手的bug。晚上参加了技术分享会，学习了新的设计模式。",
+          "color": "green",
+          "tags": ["工作", "学习", "技术"]
+        }
+      ];
+      
+      const dataStr = JSON.stringify(sampleData, null, 2);
+      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', 'diary_sample.json');
+      linkElement.click();
+    },
   }
 };
 </script>
@@ -734,5 +1046,90 @@ export default {
   .timeline-title {
     font-size: 12px;
   }
+}
+
+.timeline-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.timeline-select {
+  max-width: 250px;
+}
+
+.timeline-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 垂直时间线样式 */
+.timeline-container {
+  margin-top: 20px;
+  position: relative;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 30px;
+  margin-bottom: 24px;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+}
+
+.timeline-date {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.timeline-card {
+  border-radius: 8px;
+}
+
+/* 水平时间线样式 */
+.horizontal-timeline {
+  position: relative;
+  padding-top: 40px;
+  margin-bottom: 30px;
+  overflow-x: auto;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background-color: #e0e0e0;
+}
+
+.timeline-items {
+  display: flex;
+  flex-wrap: nowrap;
+  padding-bottom: 20px;
+}
+
+.horizontal-item {
+  flex: 0 0 300px;
+  position: relative;
+  margin-right: 30px;
+}
+
+.horizontal-item .timeline-dot {
+  top: -30px;
+  left: 10px;
+}
+
+.horizontal-item .timeline-year {
+  margin-bottom: 10px;
+  font-weight: bold;
 }
 </style>
