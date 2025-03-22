@@ -7,7 +7,7 @@
         ></v-img>
       </template>
       <template v-slot:prepend>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
       <v-app-bar-title>HZT小站</v-app-bar-title>
       <!-- 返回按钮 -->
@@ -16,18 +16,15 @@
         @click.stop="goBack"
         prepend-icon="mdi-arrow-left"
         text="返回"
+        class="d-none d-sm-flex"
       />
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
-      <v-spacer></v-spacer>
       <v-spacer></v-spacer>
       <!-- <v-btn @click="toggleTheme">toggle theme</v-btn> -->
       <v-btn
         @click.stop="go2Explore"
         variant="text"
         prepend-icon="mdi-compass-outline"
-        class="hidden-xs"
+        class="d-none d-md-flex"
       >
         探索
       </v-btn>
@@ -35,7 +32,7 @@
         @click.stop="go2jiajiao"
         variant="text"
         prepend-icon="mdi-school"
-        class="hidden-xs"
+        class="d-none d-md-flex"
       >
         家教
       </v-btn>
@@ -43,7 +40,7 @@
         @click.stop="go2nearby"
         variant="text"
         prepend-icon="mdi-map-marker"
-        class="hidden-xs"
+        class="d-none d-md-flex"
       >
         附近
       </v-btn>
@@ -51,7 +48,7 @@
         @click.stop="go2about"
         variant="text"
         prepend-icon="mdi-information"
-        class="hidden-xs"
+        class="d-none d-md-flex"
       >
         往事
       </v-btn>
@@ -59,16 +56,16 @@
         @click.stop="go2Me"
         variant="text"
         prepend-icon="mdi-account"
-        class="hidden-xs"
+        class="d-none d-md-flex"
       >
         个人信息
       </v-btn>
-      <v-btn href="http://github.com/hztBUAA" prepend-icon="mdi-github">
+      <v-btn href="http://github.com/hztBUAA" prepend-icon="mdi-github" class="d-none d-md-flex">
         github
       </v-btn>
-      <v-btn icon>
+      <!-- <v-btn icon class="d-none d-md-flex">
         <v-icon>mdi-dots-vertical</v-icon>
-      </v-btn>
+      </v-btn> -->
     </v-app-bar>
 
     <v-main>
@@ -108,6 +105,42 @@
         <span>我</span>
       </v-btn>
     </v-bottom-navigation>
+
+    <!-- 侧边导航抽屉 - 移动端使用 -->
+    <v-navigation-drawer v-model="drawer" temporary>
+      <v-list>
+        <v-list-item
+          prepend-icon="mdi-compass-outline"
+          title="探索"
+          @click="go2Explore"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-school"
+          title="家教"
+          @click="go2jiajiao"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-map-marker"
+          title="附近"
+          @click="go2nearby"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-information"
+          title="往事"
+          @click="go2about"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-account"
+          title="个人信息"
+          @click="go2Me"
+        ></v-list-item>
+        <v-list-item
+          prepend-icon="mdi-github"
+          title="GitHub"
+          href="http://github.com/hztBUAA"
+        ></v-list-item>
+      </v-list>
+    </v-navigation-drawer>
   </v-app>
 </template>
 
@@ -122,7 +155,7 @@ export default {
   },
 
   data: () => ({
-    //
+    drawer: false
   }),
   methods: {
     goBack() {
