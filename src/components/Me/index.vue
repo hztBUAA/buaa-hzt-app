@@ -168,11 +168,11 @@ export default {
     })
 
     const statistics = ref({
-      projects: { value: 0, label: '仓库数' },
-      contributions: { value: 0, label: '贡献数' },
-      followers: { value: 0, label: '关注者' },
-      following: { value: 0, label: '关注中' },
-      stars: { value: 0, label: '获得星标（包括贡献者）' }
+      projects: { value: 46, label: '仓库数' },
+      // contributions: { value: 777, label: '贡献数' },
+      followers: { value: 16, label: '关注者' },
+      following: { value:57, label: '关注中' },
+      stars: { value: 98, label: '获得星标（包括贡献者）' }
     })
 
     // 从GitHub API获取用户数据
@@ -194,64 +194,64 @@ export default {
           followers: { value: userData.followers, label: '关注者' },
           following: { value: userData.following, label: '关注中' },
           stars: { value: 0, label: '获得星标（包括贡献者）' },
-          contributions: { value: 0, label: '贡献数' }
+          // contributions: { value: 0, label: '贡献数' }
         }
 
         // 获取完整的star数据
         await fetchAllStars()
         
         // 获取贡献数据
-        await fetchContributions()
+        // await fetchContributions()
 
       } catch (error) {
         console.error('获取GitHub数据失败:', error)
       }
     }
 
-    const fetchContributions = async () => {
-      const query = `
-        query {
-          user(login: "hztBUAA") {
-            contributionsCollection {
-              totalCommitContributions
-              totalIssueContributions
-              totalPullRequestContributions
-              totalPullRequestReviewContributions
-              contributionCalendar {
-                totalContributions
-                weeks {
-                  contributionDays {
-                    contributionCount
-                    date
-                  }
-                }
-              }
-            }
-          }
-        }
-      `
+    // const fetchContributions = async () => {
+    //   const query = `
+    //     query {
+    //       user(login: "hztBUAA") {
+    //         contributionsCollection {
+    //           totalCommitContributions
+    //           totalIssueContributions
+    //           totalPullRequestContributions
+    //           totalPullRequestReviewContributions
+    //           contributionCalendar {
+    //             totalContributions
+    //             weeks {
+    //               contributionDays {
+    //                 contributionCount
+    //                 date
+    //               }
+    //             }
+    //           }
+    //         }
+    //       }
+    //     }
+    //   `
 
-      try {
-        const response = await fetch('https://api.github.com/graphql', {
-          method: 'POST',
-          headers: {
-            'Authorization': `bearer ${process.env.VUE_APP_GITHUB_TOKEN}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ query })
-        })
+    // //   try {
+    // //     const response = await fetch('https://api.github.com/graphql', {
+    // //       method: 'POST',
+    // //       headers: {
+    // //         'Authorization': `bearer ${process.env.VUE_APP_GITHUB_TOKEN}`,
+    // //         'Content-Type': 'application/json',
+    // //       },
+    // //       body: JSON.stringify({ query })
+    // //     })
 
-        const data = await response.json()
-        console.log('data', data)
-        const contributions = data.data.user.contributionsCollection
+    // //     const data = await response.json()
+    // //     console.log('data', data)
+    // //     const contributions = data.data.user.contributionsCollection
         
-        // 更新统计数据
-        statistics.value.contributions.value = 
-          contributions.contributionCalendar.totalContributions
-      } catch (error) {
-        console.error('获取贡献数据失败:', error)
-      }
-    }
+    // //     // 更新统计数据
+    // //     statistics.value.contributions.value = 
+    // //       contributions.contributionCalendar.totalContributions
+    // //   } catch (error) {
+    // //     console.error('获取贡献数据失败:', error)
+    // //   }
+    // }
 
     const fetchAllStars = async () => {
       try {
