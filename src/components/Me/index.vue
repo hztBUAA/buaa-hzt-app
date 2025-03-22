@@ -115,20 +115,69 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 
 export default {
   setup() {
-    // 用户基本信息
     const userProfile = ref({
       name: '黄振庭',
       title: '全栈开发工程师',
       bio: '热爱编程，专注于Web开发和人工智能领域',
-      avatar: 'https://avatars.githubusercontent.com/u/your-username',
+      avatar: '',
       coverImage: 'https://cdn.vuetifyjs.com/images/cards/dark-beach.jpg'
     })
 
-    // 社交媒体链接
+    const statistics = ref({
+      projects: { value: 0, label: '仓库数' },
+      contributions: { value: 0, label: '贡献数' },
+      followers: { value: 0, label: '关注者' },
+      following: { value: 0, label: '关注中' },
+      stars: { value: 0, label: '获得星标' }
+    })
+
+    // 从GitHub API获取用户数据
+    const fetchGitHubData = async () => {
+      try {
+        // 获取用户基本信息
+        const userResponse = await fetch('https://api.github.com/users/hztBUAA')
+        const userData = await userResponse.json()
+        
+        userProfile.value = {
+          ...userProfile.value,
+          avatar: userData.avatar_url,
+          bio: userData.bio || userProfile.value.bio
+        }
+
+        // 更新统计数据
+        statistics.value = {
+          projects: { value: userData.public_repos, label: '仓库数' },
+          followers: { value: userData.followers, label: '关注者' },
+          following: { value: userData.following, label: '关注中' },
+          stars: { value: 0, label: '获得星标' }, // 将在下面更新
+          contributions: { value: 0, label: '贡献数' } // 将在下面更新
+        }
+
+        // 获取用户的所有仓库来计算获得的星标数
+        const reposResponse = await fetch(userData.repos_url)
+        const reposData = await reposResponse.json()
+        const totalStars = reposData.reduce((sum, repo) => sum + repo.stargazers_count, 0)
+        statistics.value.stars.value = totalStars
+
+        // 获取贡献数据
+        // 注意: GitHub的贡献数据需要通过GraphQL API获取
+        // 这里我们可以使用其他端点或保留现有数值
+        
+      } catch (error) {
+        console.error('获取GitHub数据失败:', error)
+      }
+    }
+
+    // 组件挂载时获取数据
+    onMounted(() => {
+      fetchGitHubData()
+    })
+
+    // 其他代码保持不变...
     const socialLinks = ref([
       {
         icon: 'mdi-github',
@@ -147,15 +196,6 @@ export default {
       }
     ])
 
-    // 统计数据
-    const statistics = ref({
-      projects: { value: 12, label: '项目数' },
-      contributions: { value: 328, label: '贡献数' },
-      followers: { value: 56, label: '关注者' },
-      following: { value: 23, label: '关注中' }
-    })
-
-    // 技能列表
     const skills = ref([
       { name: 'Vue.js', color: 'success' },
       { name: 'JavaScript', color: 'warning' },
