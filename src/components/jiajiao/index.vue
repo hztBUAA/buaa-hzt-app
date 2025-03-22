@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-app-bar>
-      <v-app-bar-title>家教页面</v-app-bar-title>
+      <v-app-bar-title>家教页面(TODO)</v-app-bar-title>
     </v-app-bar>
 
     <v-sheet align="center">
@@ -74,8 +74,8 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </v-card>
-    <v-btn @click="go2profile">go to other's profile</v-btn>
-    <v-btn @click="go2card9">go to card9</v-btn>
+    <!-- <v-btn @click="go2profile">go to other's profile</v-btn> -->
+    <!-- <v-btn @click="go2card9">go to card9</v-btn> -->
   </v-container>
 </template>
 <script>
