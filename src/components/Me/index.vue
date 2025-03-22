@@ -6,7 +6,7 @@
         <!-- 页面标题 -->
         <v-col cols="12" class="mb-4">
           <h1 class="text-h4 font-weight-bold">个人资料</h1>
-          <p class="text-subtitle-1 text-medium-emphasis">用数据说话统计数据</p>
+          <p class="text-subtitle-1 text-medium-emphasis">执行力！</p>
         </v-col>
         
         <!-- 顶部背景卡片 -->
