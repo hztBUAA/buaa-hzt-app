@@ -274,7 +274,7 @@ export default {
 
     // 组件挂载时获取数据
     onMounted(() => {
-      fetchGitHubData()
+      // fetchGitHubData()
     })
 
     // 其他代码保持不变...
