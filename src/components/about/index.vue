@@ -639,7 +639,7 @@ export default {
           year: '2022.6',
           title: '卷进计算机学院',
           content:
-            '继续卷，平庸过了一年，发现保研无望，体会到各科分数无法拿到顶尖的无力感~'
+            '继续卷，平庸过了一年，体会到各科分数无法拿到顶尖的无力感~'
         },
         {
           color: 'pink',
@@ -653,7 +653,7 @@ export default {
           year: '2024.6',
           title: '参加实习',
           content:
-            '远程实习：为此担心过，也中途害怕过；最后也坚持下来，总结了一些生存之道。'
+            '实习，总结了一些生存之道。'
         },
         {
           color: 'orange',
@@ -661,6 +661,13 @@ export default {
           title: '心血来潮',
           content:
             '想用django加上vuetify加快自己开发web app的节奏，想把自己的想法和平时生活中思考的一些好点子和信息紫苑进行分享————大学这几年，深刻体会到信息差的重要性，也希望自己能够分享一些有用的信息~'
+        },
+        {
+          color: 'brown',
+          year: '2025.3',
+          title: '活跃于开源项目',
+          content:
+            'Always git clone, never pull~\nAlways pip install, never success~\nAlways try, never give up~'
         }
       ],
       images: [],
@@ -709,6 +716,34 @@ export default {
               content: '开始使用Vuetify组件库，加速UI开发效率',
               color: 'indigo',
               tags: ['Vuetify', 'UI']
+            },
+            {
+              title: '开始学习Python',
+              date: '2024.1',
+              content: '开始学习Python，希望自己能够用Python做出一些好玩的东西~',
+              color: 'green',
+              tags: ['Python', '编程']
+            },
+            {
+              title: '开始学习Django',
+              date: '2024.2',
+              content: '开始学习Django，希望自己能够用Django做出一些好玩的东西~',
+              color: 'red', 
+              tags: ['Django', '后端框架']
+            },
+            {
+              title: '开始学习Pytorch',
+              date: '2024.3',
+              content: '开始学习Vuetify，希望自己能够用Vuetify做出一些好玩的东西~',
+              color: 'blue',
+              tags: ['Pytorch', 'AI']
+            },
+            {
+              title: '上面的都是假的',
+              date: '2025.3',
+              content: '老实讲，我也不知道自己在学什么。最近也正在静静回头看自己走过的路，希望自己能够找到自己的方向。',
+              color: 'purple',
+              tags: ['反思']
             }
           ]
         },
