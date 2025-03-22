@@ -53,7 +53,7 @@
         prepend-icon="mdi-information"
         class="hidden-xs"
       >
-        关于我
+        往事
       </v-btn>
       <v-btn
         @click.stop="go2Me"
@@ -87,6 +87,10 @@
       <v-btn value="" @click="go2Recent">
         <v-icon>mdi-compass-outline</v-icon>
         <span>探索</span>
+      </v-btn>
+      <v-btn value="" @click="go2about">
+        <v-icon>mdi-account</v-icon>
+        <span>往事</span>
       </v-btn>
 
       <v-btn value="jiajiao" @click.stop="go2jiajiao">
