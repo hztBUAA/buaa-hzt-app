@@ -44,7 +44,7 @@ const routes = [
   },
   {
     path: '/me/',
-    name: 'Me',
+    name: 'Profile',
     component: () => import('./components/Me/index.vue')
   },
   {

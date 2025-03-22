@@ -55,6 +55,14 @@
       >
         关于我
       </v-btn>
+      <v-btn
+        @click.stop="go2Me"
+        variant="text"
+        prepend-icon="mdi-account"
+        class="hidden-xs"
+      >
+        个人信息
+      </v-btn>
       <v-btn href="http://github.com/hztBUAA" prepend-icon="mdi-github">
         github
       </v-btn>
@@ -93,7 +101,7 @@
 
       <v-btn value="me" @click.stop="go2Me">
         <v-icon>mdi-account</v-icon>
-        <span>我的</span>
+        <span>我</span>
       </v-btn>
     </v-bottom-navigation>
   </v-app>
@@ -133,7 +141,7 @@ export default {
     },
     go2Me() {
       this.$router.push({
-        name: 'Me'
+        name: 'Profile'
       });
     },
     go2about() {

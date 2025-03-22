@@ -3,6 +3,12 @@
     <!-- 个人资料卡片 -->
     <v-container>
       <v-row>
+        <!-- 页面标题 -->
+        <v-col cols="12" class="mb-4">
+          <h1 class="text-h4 font-weight-bold">个人资料</h1>
+          <p class="text-subtitle-1 text-medium-emphasis">用数据说话统计数据</p>
+        </v-col>
+        
         <!-- 顶部背景卡片 -->
         <v-col cols="12">
           <v-card class="profile-card">
@@ -166,7 +172,7 @@ export default {
       contributions: { value: 0, label: '贡献数' },
       followers: { value: 0, label: '关注者' },
       following: { value: 0, label: '关注中' },
-      stars: { value: 0, label: '获得星标' }
+      stars: { value: 0, label: '获得星标（包括贡献者）' }
     })
 
     // 从GitHub API获取用户数据
@@ -187,7 +193,7 @@ export default {
           projects: { value: userData.public_repos, label: '仓库数' },
           followers: { value: userData.followers, label: '关注者' },
           following: { value: userData.following, label: '关注中' },
-          stars: { value: 0, label: '获得星标' },
+          stars: { value: 0, label: '获得星标（包括贡献者）' },
           contributions: { value: 0, label: '贡献数' }
         }
 

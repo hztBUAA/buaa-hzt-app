@@ -1,6 +1,12 @@
 <template>
   <v-container>
     <v-row class="mb-4">
+      <!-- 页面标题 -->
+      <v-col cols="12" class="mb-4">
+        <h1 class="text-h4 font-weight-bold">关于我</h1>
+        <p class="text-subtitle-1 text-medium-emphasis">个人时间线和成长历程</p>
+      </v-col>
+
       <v-col cols="12" md="8">
         <v-carousel hide-delimiters>
           <v-carousel-item
