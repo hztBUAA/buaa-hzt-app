@@ -110,7 +110,7 @@
         class="mb-2"
       >
         <template v-slot:prepend>
-          <v-avatar size="36" color="grey-darken-3" :image="c.avatar">
+          <v-avatar size="36" color="grey-darken-3" :image="getRandomAvatar()">
             <template v-slot:placeholder>
               <v-row class="fill-height ma-0" align="center" justify="center">
                 <v-progress-circular indeterminate color="grey-lighten-3" size="20"></v-progress-circular>
