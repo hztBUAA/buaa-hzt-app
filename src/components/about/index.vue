@@ -118,19 +118,9 @@
         <v-card>
           <v-card-title class="text-h6">
             <v-icon start color="primary" icon="mdi-timeline-text"></v-icon>
-            选择时间线
+            操作面板
           </v-card-title>
           <v-card-text>
-            <v-select
-              v-model="currentTimeline"
-              :items="availableTimelines"
-              item-title="name"
-              item-value="id"
-              label="选择时间线"
-              variant="outlined"
-              density="comfortable"
-            ></v-select>
-            
             <v-divider class="my-4"></v-divider>
             
             <v-btn 
@@ -190,8 +180,34 @@
     
     <v-card class="mb-4">
       <v-card-title class="d-flex align-center">
-        <v-icon start color="primary" class="mr-2">{{ selectedTimeline.icon }}</v-icon>
-        <h2>{{ selectedTimeline.name }}</h2>
+        <!-- <v-icon start color="primary" class="mr-2">{{ selectedTimeline.icon }}</v-icon> -->
+        <v-select
+          v-model="currentTimeline"
+          :items="availableTimelines"
+          item-title="name"
+          item-value="id"
+          variant="outlined"
+          density="comfortable"
+          hide-details
+          class="timeline-title-select"
+          bg-color="surface"
+        >
+          <template v-slot:selection="{ item }">
+            <span class="text-h5 font-weight-bold d-flex align-center">
+              <v-icon class="mr-2">{{ item.raw.icon }}</v-icon>
+              {{ item.raw.name }}
+            </span>
+          </template>
+          <template v-slot:item="{ item, props }">
+            <v-list-item v-bind="props">
+              <template v-slot:prepend>
+                <v-icon :color="currentTimeline === item.raw.id ? 'primary' : undefined">{{ item.raw.icon }}</v-icon>
+              </template>
+              <!-- <v-list-item-title>{{ item.raw.name }}</v-list-item-title> -->
+              <v-list-item-subtitle>{{ item.raw.description }}</v-list-item-subtitle>
+            </v-list-item>
+          </template>
+        </v-select>
         <v-spacer></v-spacer>
         <v-btn-toggle
           v-model="timelineView"
@@ -1584,5 +1600,43 @@ export default {
   .video-wrapper {
     height: 250px !important;
   }
+}
+
+/* 时间线标题选择样式 */
+.timeline-title-select {
+  min-width: 250px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.timeline-title-select :deep(.v-field__input) {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  min-height: unset !important;
+}
+
+.timeline-title-select :deep(.v-field) {
+  color: rgba(0, 0, 0, 0.87) !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(0, 0, 0, 0.23) !important;
+  box-shadow: none !important;
+  background-color: white !important;
+}
+
+.timeline-title-select :deep(.v-field__append-inner) {
+  padding-top: 8px !important;
+}
+
+.timeline-title-select :deep(.v-select__selection) {
+  overflow: visible;
+  color: rgba(0, 0, 0, 0.87) !important;
+}
+
+.timeline-title-select:hover :deep(.v-field) {
+  border-color: rgba(25, 118, 210, 0.8) !important;
+}
+
+.timeline-title-select :deep(.mdi-chevron-down) {
+  color: rgba(0, 0, 0, 0.6);
 }
 </style>
