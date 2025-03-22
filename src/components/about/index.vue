@@ -6,9 +6,15 @@
           <v-carousel-item
             v-for="(item, i) in images"
             :key="i"
-            :src="item.src"
-            cover
-          ></v-carousel-item>
+          >
+            <v-img
+              :src="item.src"
+              :alt="`轮播图 ${i+1}`"
+              height="400"
+              class="d-flex align-center justify-center"
+              contain
+            ></v-img>
+          </v-carousel-item>
         </v-carousel>
       </v-col>
       <v-col cols="12" md="4">
@@ -1131,5 +1137,15 @@ export default {
 .horizontal-item .timeline-year {
   margin-bottom: 10px;
   font-weight: bold;
+}
+
+.v-carousel-item .v-img {
+  object-fit: contain;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
+.v-img__img--contain {
+  object-position: center;
 }
 </style>
