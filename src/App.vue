@@ -27,13 +27,23 @@
         @click.stop="go2Explore"
         variant="text"
         prepend-icon="mdi-compass-outline"
+        class="hidden-xs"
       >
         探索
+      </v-btn>
+      <v-btn
+        @click.stop="go2jiajiao"
+        variant="text"
+        prepend-icon="mdi-school"
+        class="hidden-xs"
+      >
+        家教
       </v-btn>
       <v-btn
         @click.stop="go2nearby"
         variant="text"
         prepend-icon="mdi-map-marker"
+        class="hidden-xs"
       >
         附近
       </v-btn>
@@ -41,6 +51,7 @@
         @click.stop="go2about"
         variant="text"
         prepend-icon="mdi-information"
+        class="hidden-xs"
       >
         关于我
       </v-btn>
@@ -63,27 +74,25 @@
       <router-view></router-view>
     </v-main>
 
-    <v-bottom-navigation :elevation="24">
+    <!-- 只在移动端显示底部导航栏 -->
+    <v-bottom-navigation :elevation="24" class="d-md-none">
       <v-btn value="" @click="go2Recent">
-        <v-icon>mdi-history</v-icon>
-
+        <v-icon>mdi-compass-outline</v-icon>
         <span>探索</span>
       </v-btn>
 
-      <v-btn value="favorites" @click.stop="go2Favorites">
-        <v-icon>mdi-heart</v-icon>
-
-        <span>猜你喜欢</span>
-      </v-btn>
       <v-btn value="jiajiao" @click.stop="go2jiajiao">
         <v-icon>mdi-school</v-icon>
-
         <span>家教</span>
       </v-btn>
 
-      <v-btn value="me" @click.stop="go2Me">
+      <v-btn value="nearby" @click.stop="go2nearby">
         <v-icon>mdi-map-marker</v-icon>
+        <span>附近</span>
+      </v-btn>
 
+      <v-btn value="me" @click.stop="go2Me">
+        <v-icon>mdi-account</v-icon>
         <span>我的</span>
       </v-btn>
     </v-bottom-navigation>
@@ -148,3 +157,19 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+/* 在中等尺寸及以上的设备隐藏 */
+@media (min-width: 960px) {
+  .d-md-none {
+    display: none !important;
+  }
+}
+
+/* 在小尺寸设备上隐藏 */
+@media (max-width: 599px) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+</style>
