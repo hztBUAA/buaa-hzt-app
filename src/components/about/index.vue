@@ -8,18 +8,48 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-carousel hide-delimiters>
+        <v-carousel hide-delimiters show-arrows="hover">
           <v-carousel-item
             v-for="(item, i) in images"
             :key="i"
           >
+            <!-- 图片显示 -->
             <v-img
+              v-if="item.type === 'image'"
               :src="item.src"
               :alt="`轮播图 ${i+1}`"
               height="400"
               class="d-flex align-center justify-center"
               contain
-            ></v-img>
+            >
+              <!-- <div class="media-caption">{{ item.name || `图片 ${i+1}` }}</div> -->
+            </v-img>
+            
+            <!-- GIF显示 -->
+            <v-img
+              v-else-if="item.type === 'gif'"
+              :src="item.src"
+              :alt="`动态图 ${i+1}`"
+              height="400"
+              class="d-flex align-center justify-center"
+              contain
+            >
+              <!-- <div class="media-caption">{{ item.name || `动图 ${i+1}` }}</div> -->
+            </v-img>
+            
+            <!-- 视频显示 -->
+            <div class="video-wrapper" v-else-if="item.type === 'video'">
+              <video
+                :src="item.src"
+                height="400"
+                class="d-flex align-center justify-center video-container"
+                controls
+                muted
+                autoplay
+                loop
+              ></video>
+              <!-- <div class="media-caption">{{ item.name || `视频 ${i+1}` }}</div> -->
+            </div>
           </v-carousel-item>
         </v-carousel>
       </v-col>
@@ -63,7 +93,26 @@
             >
               导出当前时间线
             </v-btn>
-            
+            <v-btn 
+              color="primary" 
+              prepend-icon="mdi-notebook-plus" 
+              variant="tonal"
+              block
+              class="mb-2"
+              @click="openDiaryImportDialog"
+            >
+              导入日记数据
+            </v-btn>
+            <v-btn 
+              color="primary" 
+              prepend-icon="mdi-image-plus" 
+              variant="tonal"
+              block
+              class="mb-2"
+              @click="showMediaUploadDialog = true"
+            >
+              上传媒体文件
+            </v-btn>
             <v-btn 
               color="secondary" 
               prepend-icon="mdi-plus" 
@@ -94,35 +143,6 @@
         </v-btn-toggle>
       </v-card-title>
       <v-card-subtitle>{{ selectedTimeline.description }}</v-card-subtitle>
-      
-      <v-card-text>
-        <v-row>
-          <v-col cols="12" sm="6">
-            <v-btn 
-              color="primary" 
-              prepend-icon="mdi-upload" 
-              variant="tonal"
-              block
-              class="mb-2"
-              @click="showImportDialog = true"
-            >
-              导入时间线数据
-            </v-btn>
-          </v-col>
-          <v-col cols="12" sm="6">
-            <v-btn 
-              color="primary" 
-              prepend-icon="mdi-notebook-plus" 
-              variant="tonal"
-              block
-              class="mb-2"
-              @click="openDiaryImportDialog"
-            >
-              导入日记数据
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-card-text>
     </v-card>
     
     <!-- 垂直时间线视图 -->
@@ -478,6 +498,76 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
+    <!-- 媒体文件上传对话框 -->
+    <v-dialog v-model="showMediaUploadDialog" max-width="600">
+      <v-card>
+        <v-card-title class="text-h5">
+          <v-icon start icon="mdi-image-plus" class="mr-2"></v-icon>
+          上传媒体文件
+        </v-card-title>
+        <v-card-text>
+          <v-alert
+            v-if="mediaUploadError"
+            type="error"
+            variant="tonal"
+            density="comfortable"
+            class="mb-3"
+          >
+            {{ mediaUploadError }}
+          </v-alert>
+          
+          <v-file-input
+            v-model="mediaFile"
+            accept="image/*, video/mp4, image/gif"
+            label="选择图片、视频或GIF"
+            prepend-icon="mdi-file-image"
+            variant="outlined"
+            class="mb-4"
+            show-size
+            hint="支持JPG、PNG、SVG图片，MP4视频和GIF动图"
+            persistent-hint
+            @change="handleMediaFileSelect"
+          ></v-file-input>
+          
+          <v-text-field
+            v-model="mediaName"
+            label="媒体文件名称"
+            variant="outlined"
+            hint="为上传的媒体文件添加描述性名称"
+            persistent-hint
+            class="mb-4"
+          ></v-text-field>
+          
+          <div v-if="mediaPreview" class="media-preview mb-4">
+            <h3 class="mb-2">预览:</h3>
+            <div class="preview-container">
+              <img v-if="mediaType === 'image' || mediaType === 'gif'" :src="mediaPreview" class="preview-image" />
+              <video v-else-if="mediaType === 'video'" :src="mediaPreview" controls class="preview-video"></video>
+            </div>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            @click="uploadMedia"
+            :disabled="!canUploadMedia"
+            :loading="mediaUploading"
+          >
+            上传
+          </v-btn>
+          <v-btn
+            color="grey"
+            variant="text"
+            @click="showMediaUploadDialog = false"
+          >
+            取消
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -631,6 +721,15 @@ export default {
       diaryImportLoading: false,
       diaryImportError: '',
       diaryImportSuccess: '',
+      // 媒体上传相关
+      showMediaUploadDialog: false,
+      mediaFile: null,
+      mediaName: '',
+      mediaPreview: null,
+      mediaType: null,
+      mediaUploadError: '',
+      mediaUploading: false,
+      canUploadMedia: false,
     };
   },
   computed: {
@@ -650,7 +749,7 @@ export default {
       // 从availableTimelines中查找时间线
       const timeline = this.availableTimelines.find(t => t.id === this.currentTimeline);
       return timeline || this.availableTimelines[0];
-    }
+    },
   },
   created() {
     this.loadImages();
@@ -662,19 +761,62 @@ export default {
   methods: {
     loadImages() {
       try {
-        const requireContext = require.context('./', false, /\.(png|jpe?g|svg)$/);
-        this.images = requireContext.keys().map(file => ({
-          src: requireContext(file)
+        // 加载图片
+        const imageContext = require.context('./', false, /\.(png|jpe?g|svg)$/);
+        const images = imageContext.keys().map(file => ({
+          src: imageContext(file),
+          type: 'image',
+          name: file.replace('./', '').replace(/\.(png|jpe?g|svg)$/, '')
         }));
+        
+        // 尝试加载视频和GIF (如果存在)
+        let mediaFiles = [];
+        try {
+          const mediaContext = require.context('./', false, /\.(mp4|gif)$/);
+          mediaFiles = mediaContext.keys().map(file => {
+            const isGif = file.endsWith('.gif');
+            return {
+              src: mediaContext(file),
+              type: isGif ? 'gif' : 'video',
+              name: file.replace('./', '').replace(/\.(mp4|gif)$/, '')
+            };
+          });
+        } catch (mediaError) {
+          console.log('没有找到视频或GIF文件:', mediaError);
+        }
+        
+        // 合并图片和媒体文件
+        this.images = [...images, ...mediaFiles];
+        
+        // 如果没有找到任何媒体文件，使用默认图片
+        if (this.images.length === 0) {
+          this.useDefaultImages();
+        }
       } catch (error) {
-        console.error('加载图片失败:', error);
-        // 使用一些默认图片
-        this.images = [
-          { src: 'https://picsum.photos/id/11/500/300' },
-          { src: 'https://picsum.photos/id/12/500/300' },
-          { src: 'https://picsum.photos/id/13/500/300' }
-        ];
+        console.error('加载媒体文件失败:', error);
+        this.useDefaultImages();
       }
+    },
+    
+    useDefaultImages() {
+      // 使用一些默认图片
+      this.images = [
+        { 
+          src: 'https://picsum.photos/id/11/800/400', 
+          type: 'image',
+          name: '风景图1'
+        },
+        { 
+          src: 'https://i.imgur.com/A1XKkZD.gif', 
+          type: 'gif',
+          name: '编程示例'
+        },
+        { 
+          src: 'https://picsum.photos/id/12/800/400', 
+          type: 'image',
+          name: '风景图2'
+        }
+      ];
     },
     // 获取颜色样式
     getColor(colorName) {
@@ -973,11 +1115,129 @@ export default {
       linkElement.setAttribute('download', 'diary_sample.json');
       linkElement.click();
     },
+    // 判断是否为视频或GIF
+    isVideoOrGif(src) {
+      const videoExtensions = ['.mp4', '.avi', '.mov', '.wmv', '.mkv'];
+      const gifExtensions = ['.gif'];
+      const ext = src.substring(src.lastIndexOf('.')).toLowerCase();
+      return videoExtensions.includes(ext) || gifExtensions.includes(ext);
+    },
+    // 判断是否为GIF
+    isGif(src) {
+      const ext = src.substring(src.lastIndexOf('.')).toLowerCase();
+      return ext === '.gif';
+    },
+    // 处理媒体文件选择
+    handleMediaFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      this.mediaFile = file;
+      this.mediaName = file.name.replace(/\.[^/.]+$/, '');
+      
+      // 根据MIME类型判断媒体类型
+      if (file.type.startsWith('image/gif')) {
+        this.mediaType = 'gif';
+      } else if (file.type.startsWith('video/')) {
+        this.mediaType = 'video';
+      } else if (file.type.startsWith('image/')) {
+        this.mediaType = 'image';
+      } else {
+        this.mediaType = 'unknown';
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        this.mediaPreview = event.target.result;
+        this.canUploadMedia = true;
+      };
+      reader.readAsDataURL(file);
+    },
+    // 上传媒体文件
+    uploadMedia() {
+      if (!this.mediaFile) {
+        this.mediaUploadError = '请选择要上传的媒体文件';
+        return;
+      }
+      
+      // 将文件添加到本地状态
+      const newMedia = {
+        src: this.mediaPreview,
+        type: this.mediaType,
+        name: this.mediaName
+      };
+      
+      // 将新的媒体文件添加到轮播图中
+      this.images.push(newMedia);
+      
+      // 显示成功提示并关闭对话框
+      alert('媒体文件已添加到轮播图中');
+      this.resetMediaUpload();
+      this.showMediaUploadDialog = false;
+    },
+    // 重置媒体上传状态
+    resetMediaUpload() {
+      this.mediaFile = null;
+      this.mediaName = '';
+      this.mediaPreview = null;
+      this.mediaType = null;
+      this.mediaUploadError = '';
+      this.mediaUploading = false;
+      this.canUploadMedia = false;
+    },
   }
 };
 </script>
 
 <style scoped>
+/* 轮播图相关样式 */
+.v-carousel {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.v-carousel-item .v-img {
+  object-fit: contain;
+  width: 100%;
+  background-color: #f5f5f5;
+}
+
+.v-img__img--contain {
+  object-position: center;
+}
+
+/* 视频容器样式 */
+.video-container {
+  width: 100%;
+  height: 400px;
+  object-fit: contain;
+  background-color: #000;
+  display: block;
+  margin: 0 auto;
+}
+
+/* 响应式调整 */
+@media (max-width: 960px) {
+  .v-carousel, .video-container {
+    height: 300px !important;
+  }
+  
+  .v-carousel-item .v-img {
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .v-carousel, .video-container {
+    height: 250px !important;
+  }
+  
+  .v-carousel-item .v-img {
+    height: 250px !important;
+  }
+}
+
 .horizontal-timeline {
   position: relative;
   margin: 40px 0;
@@ -1145,13 +1405,65 @@ export default {
   font-weight: bold;
 }
 
-.v-carousel-item .v-img {
-  object-fit: contain;
-  width: 100%;
-  background-color: #f5f5f5;
+.media-preview {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #f9f9f9;
 }
 
-.v-img__img--contain {
-  object-position: center;
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  overflow: hidden;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 300px;
+  object-fit: contain;
+}
+
+.preview-video {
+  width: 100%;
+  max-height: 300px;
+  background-color: #000;
+}
+
+.media-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 8px 16px;
+  text-align: center;
+  font-size: 14px;
+  backdrop-filter: blur(4px);
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+}
+
+@media (max-width: 960px) {
+  .video-wrapper {
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .video-wrapper {
+    height: 250px !important;
+  }
 }
 </style>
