@@ -1,0 +1,28 @@
+[
+  {
+    "date": "2025.03.22",
+    "title": "日记: 2025.03.22",
+    "content": "完成了: 完成Python项目重构, 阅读《原子习惯》30分钟, 散步20分钟 早起第一件事就是开始昨天定下的任务：继续完成Python项目的重构工作。按照计划完成了模块解耦，效果比预期的要好。 今天早上7点起床，比昨天提前了半小时，感觉很好。虽然昨晚睡得有点晚，但早起的感觉还是很舒服。 晚上...",
+    "color": "green",
+    "tags": [
+      "重构",
+      "工作记录",
+      "生活小记",
+      "时间管理",
+      "编程"
+    ]
+  },
+  {
+    "date": "2025.03.22",
+    "title": "日记: 2025.03.22",
+    "content": "这将扫描指定文件夹中的所有Markdown文件，并在当前目录下生成`timeline_data.json`文件。 python diary_summarizer.py /path/to/diary/folder python diary_summarizer.py /path/to/diary...",
+    "color": "orange",
+    "tags": [
+      "高级选项",
+      "输出格式",
+      "要求",
+      "功能特点",
+      "导入到时间线"
+    ]
+  }
+]
