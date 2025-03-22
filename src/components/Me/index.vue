@@ -161,7 +161,7 @@ export default {
   setup() {
     const userProfile = ref({
       name: '黄振庭',
-      title: '全栈开发工程师',
+      title: '全(啥)栈(也)开(不)发(会)攻城狮',
       bio: '热爱编程，专注于Web开发和人工智能领域',
       avatar: '',
       coverImage: 'https://cdn.vuetifyjs.com/images/parallax/material.jpg'
