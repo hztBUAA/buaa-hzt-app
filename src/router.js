@@ -14,12 +14,12 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('./components/Post/index.vue')
+    component: () => import('./components/Explore/index.vue')
   },
   {
-    path: '/post/',
-    name: 'Post',
-    component: () => import('./components/Post/index.vue')
+    path: '/explore/',
+    name: 'Explore',
+    component: () => import('./components/Explore/index.vue')
   },
   {
     path: '/snackbar/',

@@ -24,16 +24,16 @@
       <v-spacer></v-spacer>
       <!-- <v-btn @click="toggleTheme">toggle theme</v-btn> -->
       <v-btn
-        @click.stop="go2Posts"
+        @click.stop="go2Explore"
         variant="text"
-        prepend-icon="mdi-post-outline"
+        prepend-icon="mdi-compass-outline"
       >
-        动态
+        探索
       </v-btn>
       <v-btn
         @click.stop="go2nearby"
         variant="text"
-        prepend-icon="mdi-account-multiple"
+        prepend-icon="mdi-map-marker"
       >
         附近
       </v-btn>
@@ -109,7 +109,7 @@ export default {
     },
     go2Recent() {
       this.$router.push({
-        name: 'Post'
+        name: 'Explore'
       });
     },
     go2Favorites() {
@@ -132,9 +132,9 @@ export default {
         name: 'About'
       });
     },
-    go2Posts() {
+    go2Explore() {
       this.$router.push({
-        name: 'Post'
+        name: 'Explore'
       });
     },
     go2nearby() {
