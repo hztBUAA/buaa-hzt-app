@@ -8,9 +8,52 @@
       </v-col>
 
       <v-col cols="12" md="8">
-        <v-carousel hide-delimiters show-arrows="hover">
+        <!-- 媒体类型选择器 -->
+        <v-card class="mb-4 pa-3">
+          <div class="d-flex align-center justify-space-between flex-wrap">
+            <div>
+              <v-btn-toggle 
+                v-model="selectedMediaType" 
+                color="primary"
+                density="comfortable"
+                mandatory
+              >
+                <v-btn value="all" variant="text">
+                  <v-icon start>mdi-image-multiple</v-icon>
+                  全部
+                </v-btn>
+                <v-btn value="image" variant="text">
+                  <v-icon start>mdi-image</v-icon>
+                  图片
+                </v-btn>
+                <v-btn value="gif" variant="text">
+                  <v-icon start>mdi-animation</v-icon>
+                  动图
+                </v-btn>
+                <v-btn value="video" variant="text">
+                  <v-icon start>mdi-video</v-icon>
+                  视频
+                </v-btn>
+              </v-btn-toggle>
+            </div>
+            
+            <div class="mt-2 mt-sm-0">
+              <v-btn 
+                color="primary" 
+                prepend-icon="mdi-image-plus" 
+                size="small"
+                @click="showMediaUploadDialog = true"
+              >
+                上传媒体文件
+              </v-btn>
+            </div>
+          </div>
+        </v-card>
+        
+        <!-- 媒体轮播 -->
+        <v-carousel v-if="filteredImages.length > 0" hide-delimiters show-arrows="hover">
           <v-carousel-item
-            v-for="(item, i) in images"
+            v-for="(item, i) in filteredImages"
             :key="i"
           >
             <!-- 图片显示 -->
@@ -52,6 +95,24 @@
             </div>
           </v-carousel-item>
         </v-carousel>
+        
+        <!-- 无匹配媒体时显示 -->
+        <v-card v-else class="pa-4 d-flex align-center justify-center" height="400">
+          <div class="text-center">
+            <v-icon icon="mdi-image-off" size="x-large" color="grey" class="mb-4"></v-icon>
+            <h3 class="text-h6 text-grey">没有{{ mediaTypeText }}可显示</h3>
+            <p class="text-body-2 text-grey-darken-1">嘿嘿，可以点击"上传媒体文件"按钮添加新的{{ mediaTypeText }}</p>
+            <v-btn 
+              color="primary" 
+              prepend-icon="mdi-image-plus" 
+              variant="tonal"
+              class="mt-4"
+              @click="showMediaUploadDialog = true"
+            >
+              上传媒体文件
+            </v-btn>
+          </div>
+        </v-card>
       </v-col>
       <v-col cols="12" md="4">
         <v-card>
@@ -499,71 +560,61 @@
       </v-card>
     </v-dialog>
     
-    <!-- 媒体文件上传对话框 -->
+    <!-- 媒体上传对话框 -->
     <v-dialog v-model="showMediaUploadDialog" max-width="600">
       <v-card>
         <v-card-title class="text-h5">
-          <v-icon start icon="mdi-image-plus" class="mr-2"></v-icon>
           上传媒体文件
+          <v-btn icon @click="showMediaUploadDialog = false" class="float-right">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
         </v-card-title>
+        
         <v-card-text>
-          <v-alert
-            v-if="mediaUploadError"
-            type="error"
-            variant="tonal"
-            density="comfortable"
-            class="mb-3"
-          >
-            {{ mediaUploadError }}
-          </v-alert>
-          
-          <v-file-input
-            v-model="mediaFile"
-            accept="image/*, video/mp4, image/gif"
-            label="选择图片、视频或GIF"
-            prepend-icon="mdi-file-image"
-            variant="outlined"
-            class="mb-4"
-            show-size
-            hint="支持JPG、PNG、SVG图片，MP4视频和GIF动图"
-            persistent-hint
-            @change="handleMediaFileSelect"
-          ></v-file-input>
-          
-          <v-text-field
-            v-model="mediaName"
-            label="媒体文件名称"
-            variant="outlined"
-            hint="为上传的媒体文件添加描述性名称"
-            persistent-hint
-            class="mb-4"
-          ></v-text-field>
-          
-          <div v-if="mediaPreview" class="media-preview mb-4">
-            <h3 class="mb-2">预览:</h3>
-            <div class="preview-container">
-              <img v-if="mediaType === 'image' || mediaType === 'gif'" :src="mediaPreview" class="preview-image" />
-              <video v-else-if="mediaType === 'video'" :src="mediaPreview" controls class="preview-video"></video>
+          <v-form ref="uploadForm" @submit.prevent="uploadMedia">
+            <v-file-input
+              v-model="mediaFile"
+              accept="image/*, video/*"
+              placeholder="选择图片或视频文件"
+              prepend-icon="mdi-file-upload"
+              label="媒体文件"
+              :rules="[v => !!v || '请选择一个文件']"
+              @change="previewMedia"
+            ></v-file-input>
+            
+            <v-text-field
+              v-model="mediaName"
+              label="媒体名称"
+              placeholder="为您的媒体文件起个名字"
+              prepend-icon="mdi-tag"
+              :rules="[v => !!v || '请输入媒体名称']"
+            ></v-text-field>
+            
+            <!-- 预览区域 -->
+            <div v-if="mediaPreview" class="media-preview my-4">
+              <p class="text-subtitle-2 mb-2">预览:</p>
+              <v-card class="pa-2" flat>
+                <div class="d-flex justify-center">
+                  <img v-if="mediaType === 'image' || mediaType === 'gif'" :src="mediaPreview" class="preview-image" />
+                  <video v-else-if="mediaType === 'video'" :src="mediaPreview" controls class="preview-video"></video>
+                </div>
+              </v-card>
             </div>
-          </div>
+          </v-form>
         </v-card-text>
+        
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            variant="tonal"
+          <v-btn color="grey-darken-1" variant="text" @click="showMediaUploadDialog = false">
+            取消
+          </v-btn>
+          <v-btn 
+            color="primary" 
             @click="uploadMedia"
-            :disabled="!canUploadMedia"
-            :loading="mediaUploading"
+            :disabled="!mediaFile || !mediaName"
+            :loading="uploadingMedia"
           >
             上传
-          </v-btn>
-          <v-btn
-            color="grey"
-            variant="text"
-            @click="showMediaUploadDialog = false"
-          >
-            取消
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -727,9 +778,9 @@ export default {
       mediaName: '',
       mediaPreview: null,
       mediaType: null,
-      mediaUploadError: '',
-      mediaUploading: false,
-      canUploadMedia: false,
+      uploadingMedia: false,
+      // 媒体类型选择
+      selectedMediaType: 'all',
     };
   },
   computed: {
@@ -750,6 +801,22 @@ export default {
       const timeline = this.availableTimelines.find(t => t.id === this.currentTimeline);
       return timeline || this.availableTimelines[0];
     },
+    // 根据选择的媒体类型筛选图片
+    filteredImages() {
+      if (this.selectedMediaType === 'all') {
+        return this.images;
+      }
+      return this.images.filter(item => item.type === this.selectedMediaType);
+    },
+    // 获取当前媒体类型的文字描述
+    mediaTypeText() {
+      switch(this.selectedMediaType) {
+        case 'image': return '图片';
+        case 'gif': return '动图';
+        case 'video': return '视频';
+        default: return '媒体文件';
+      }
+    }
   },
   created() {
     this.loadImages();
@@ -799,22 +866,30 @@ export default {
     },
     
     useDefaultImages() {
-      // 使用一些默认图片
       this.images = [
-        { 
-          src: 'https://picsum.photos/id/11/800/400', 
+        {
+          src: 'https://cdn.pixabay.com/photo/2016/11/19/14/00/code-1839406_1280.jpg',
+          name: '编程示例',
           type: 'image',
-          name: '风景图1'
+          date: '2023-01-01'
         },
-        { 
-          src: 'https://i.imgur.com/A1XKkZD.gif', 
+        {
+          src: 'https://cdn.pixabay.com/photo/2018/09/27/09/22/artificial-intelligence-3706562_1280.jpg',
+          name: '人工智能',
+          type: 'image',
+          date: '2023-02-01'
+        },
+        {
+          src: 'https://cdn.pixabay.com/animation/2022/11/10/09/20/09-20-06-161_512.gif',
+          name: '电子技术',
           type: 'gif',
-          name: '编程示例'
+          date: '2023-03-01'
         },
-        { 
-          src: 'https://picsum.photos/id/12/800/400', 
-          type: 'image',
-          name: '风景图2'
+        {
+          src: 'https://cdn.pixabay.com/animation/2023/02/12/05/47/05-47-36-198_512.gif',
+          name: '图表动画',
+          type: 'gif',
+          date: '2023-04-01'
         }
       ];
     },
@@ -1127,63 +1202,78 @@ export default {
       const ext = src.substring(src.lastIndexOf('.')).toLowerCase();
       return ext === '.gif';
     },
-    // 处理媒体文件选择
-    handleMediaFileSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      
-      this.mediaFile = file;
-      this.mediaName = file.name.replace(/\.[^/.]+$/, '');
-      
-      // 根据MIME类型判断媒体类型
-      if (file.type.startsWith('image/gif')) {
-        this.mediaType = 'gif';
-      } else if (file.type.startsWith('video/')) {
-        this.mediaType = 'video';
-      } else if (file.type.startsWith('image/')) {
-        this.mediaType = 'image';
-      } else {
-        this.mediaType = 'unknown';
-      }
-      
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        this.mediaPreview = event.target.result;
-        this.canUploadMedia = true;
-      };
-      reader.readAsDataURL(file);
-    },
-    // 上传媒体文件
-    uploadMedia() {
-      if (!this.mediaFile) {
-        this.mediaUploadError = '请选择要上传的媒体文件';
+    // 预览选择的媒体文件
+    previewMedia(file) {
+      if (!file) {
+        this.mediaPreview = null;
+        this.mediaType = null;
         return;
       }
       
-      // 将文件添加到本地状态
-      const newMedia = {
-        src: this.mediaPreview,
-        type: this.mediaType,
-        name: this.mediaName
-      };
+      // 确定媒体类型
+      if (file.type.startsWith('image/gif')) {
+        this.mediaType = 'gif';
+      } else if (file.type.startsWith('image/')) {
+        this.mediaType = 'image';
+      } else if (file.type.startsWith('video/')) {
+        this.mediaType = 'video';
+      } else {
+        this.mediaType = null;
+      }
       
-      // 将新的媒体文件添加到轮播图中
-      this.images.push(newMedia);
-      
-      // 显示成功提示并关闭对话框
-      alert('媒体文件已添加到轮播图中');
-      this.resetMediaUpload();
-      this.showMediaUploadDialog = false;
+      // 创建预览URL
+      this.mediaPreview = URL.createObjectURL(file);
     },
-    // 重置媒体上传状态
-    resetMediaUpload() {
-      this.mediaFile = null;
-      this.mediaName = '';
-      this.mediaPreview = null;
-      this.mediaType = null;
-      this.mediaUploadError = '';
-      this.mediaUploading = false;
-      this.canUploadMedia = false;
+    // 上传媒体文件
+    async uploadMedia() {
+      if (!this.mediaFile || !this.mediaName) return;
+      
+      this.uploadingMedia = true;
+      
+      try {
+        // 在实际应用中，这里应该是将文件上传到服务器的代码
+        // 由于这是前端模拟，我们直接使用本地URL
+        
+        const newMedia = {
+          src: this.mediaPreview,
+          name: this.mediaName,
+          type: this.mediaType,
+          date: new Date().toISOString()
+        };
+        
+        // 添加到图片列表
+        this.images.push(newMedia);
+        
+        // 关闭对话框并重置
+        this.showMediaUploadDialog = false;
+        this.mediaFile = null;
+        this.mediaName = '';
+        this.mediaPreview = null;
+        
+        // 显示成功消息
+        this.showSuccessToast('媒体文件上传成功');
+      } catch (error) {
+        console.error('上传失败:', error);
+        this.showErrorToast('媒体文件上传失败');
+      } finally {
+        this.uploadingMedia = false;
+      }
+    },
+    // 上传成功消息
+    showSuccessToast(message) {
+      if (this.$toast) {
+        this.$toast.success(message);
+      } else {
+        alert(message);
+      }
+    },
+    // 错误消息
+    showErrorToast(message) {
+      if (this.$toast) {
+        this.$toast.error(message);
+      } else {
+        alert(message);
+      }
     },
   }
 };
@@ -1420,16 +1510,10 @@ export default {
   overflow: hidden;
 }
 
-.preview-image {
+.preview-image, .preview-video {
   max-width: 100%;
   max-height: 300px;
   object-fit: contain;
-}
-
-.preview-video {
-  width: 100%;
-  max-height: 300px;
-  background-color: #000;
 }
 
 .media-caption {
